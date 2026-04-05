@@ -1,18 +1,37 @@
 package com.artembilous.docugen.controller;
 
+import com.artembilous.docugen.dto.CompleteRegistrationRequest;
+import com.artembilous.docugen.dto.MeResponse;
+import com.artembilous.docugen.entity.User;
+import com.artembilous.docugen.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/users")
 public class UserController {
 
-    @GetMapping("/user")
-    public String me(@AuthenticationPrincipal Jwt jwt) {
-        return jwt.getClaim("docugen-api/email");
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
+    @GetMapping("/me")
+    public MeResponse me(@AuthenticationPrincipal User user) {
+        return new MeResponse(
+                user.getUserId(),
+                user.getEmail(),
+                user.getName(),
+                user.getSurname(),
+                userService.isFullyRegistered(user)
+        );
+    }
+
+    @PostMapping("/complete-registration")
+    public void complete(@AuthenticationPrincipal User user, @Valid @RequestBody CompleteRegistrationRequest req) {
+        userService.completeRegistration(user, req.name(), req.surname());
     }
 }
