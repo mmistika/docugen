@@ -34,4 +34,6 @@ public interface MembershipRepository extends JpaRepository<Membership, Long> {
         WHERE m.user = :user
     """)
     List<OrganisationDTO> findUserOrganisations(User user);
+
+    List<Membership> findByOrganisationOrganisationId(Long orgId);
 }

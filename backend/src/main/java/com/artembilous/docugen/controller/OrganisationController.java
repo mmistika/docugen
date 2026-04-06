@@ -1,12 +1,14 @@
 package com.artembilous.docugen.controller;
 
 import com.artembilous.docugen.dto.CreateOrganisationRequest;
+import com.artembilous.docugen.dto.MemberDTO;
 import com.artembilous.docugen.dto.OrganisationDTO;
 import com.artembilous.docugen.entity.User;
 import com.artembilous.docugen.exception.RegistrationIncompleteException;
 import com.artembilous.docugen.service.OrganisationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,5 +34,11 @@ public class OrganisationController {
         }
 
         orgService.createOrganisation(user, req.name());
+    }
+
+    @GetMapping("/{orgId}/members")
+    @PreAuthorize("hasPermission(#orgId, 'members:manage')")
+    public List<MemberDTO> getMembers(@AuthenticationPrincipal User user, @PathVariable Long orgId) {
+        return orgService.getOrganisationMembers(orgId);
     }
 }

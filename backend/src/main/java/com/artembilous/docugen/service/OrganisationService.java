@@ -1,5 +1,6 @@
 package com.artembilous.docugen.service;
 
+import com.artembilous.docugen.dto.MemberDTO;
 import com.artembilous.docugen.dto.OrganisationDTO;
 import com.artembilous.docugen.entity.Membership;
 import com.artembilous.docugen.entity.Organisation;
@@ -41,5 +42,18 @@ public class OrganisationService {
         membershipRepo.save(m);
 
         return org;
+    }
+
+    public List<MemberDTO> getOrganisationMembers(Long orgId) {
+        List<Membership> memberships = membershipRepo.findByOrganisationOrganisationId(orgId);
+        return memberships.stream()
+                .map(m -> new MemberDTO(
+                        m.getMembershipId(),
+                        m.getUser().getName(),
+                        m.getUser().getSurname(),
+                        m.getUser().getEmail(),
+                        m.getRoles().stream().map(Role::getName).toList()
+                ))
+                .toList();
     }
 }
