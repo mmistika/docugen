@@ -1,0 +1,43 @@
+package com.artembilous.docugen.entity;
+
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "template_versions")
+@Getter
+@Setter
+@ToString
+public class TemplateVersion {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long templateVersionId;
+
+    @ManyToOne
+    @JoinColumn(name = "template_id", nullable = false)
+    private Template template;
+
+    @Column(nullable = false)
+    private Integer version;
+
+    @Lob
+    @Column(columnDefinition = "TEXT", nullable = false)
+    private String manifest;
+
+    @Lob
+    @Column(columnDefinition = "TEXT", nullable = false)
+    private String content;
+
+    @Enumerated(EnumType.STRING)
+    private TemplateVersionStatus status;
+
+    @CreationTimestamp
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+}
