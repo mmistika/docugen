@@ -33,12 +33,12 @@ public class DocumentController {
                 .body(file);
     }
 
-    @PutMapping("{id}/finalise")
+    @PatchMapping("{id}/finalise")
     public void finalise(@AuthenticationPrincipal User user, @PathVariable Long orgId, @PathVariable Long id) {
         service.finalise(user, orgId, id);
     }
 
-    @PutMapping("{id}/revert")
+    @PatchMapping("{id}/revert")
     public void revert(@AuthenticationPrincipal User user, @PathVariable Long orgId, @PathVariable Long id) {
         service.revert(user, orgId, id);
     }
