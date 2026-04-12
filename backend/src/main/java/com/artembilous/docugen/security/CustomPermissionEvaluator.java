@@ -1,7 +1,7 @@
 package com.artembilous.docugen.security;
 
 import com.artembilous.docugen.entity.User;
-import com.artembilous.docugen.service.RbacService;
+import com.artembilous.docugen.repository.MembershipRepository;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.security.access.PermissionEvaluator;
@@ -14,7 +14,7 @@ import java.io.Serializable;
 @RequiredArgsConstructor
 public class CustomPermissionEvaluator implements PermissionEvaluator {
 
-    private final RbacService rbacService;
+    private final MembershipRepository membershipRepository;
 
     @Override
     public boolean hasPermission(@NonNull Authentication auth, @NonNull Object targetDomainObject, @NonNull Object permission) {
@@ -39,6 +39,6 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
             return false;
         }
         User user = userAuth.getUser();
-        return rbacService.hasPermission(user, orgId, permissionName);
+        return membershipRepository.existsPermission(user.getUserId(), orgId, permissionName);
     }
 }
