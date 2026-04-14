@@ -7,10 +7,23 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface MembershipRepository extends JpaRepository<Membership, Long> {
 
     boolean existsByUser(User user);
+
+    Optional<Membership> findByMembershipIdAndOrganisationOrganisationId(Long membershipId, Long orgId);
+
+    @Query("""
+        SELECT COUNT(m) > 0
+        FROM Membership m
+        JOIN m.roles r
+        WHERE m.organisation.organisationId = :orgId
+        AND r.name = 'ADMIN'
+        AND m.membershipId != :membershipId
+    """)
+    boolean existsAnotherAdmin(Long orgId, Long membershipId);
 
     @Query("""
         SELECT COUNT(p) > 0

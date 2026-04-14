@@ -3,10 +3,9 @@ package com.artembilous.docugen.service;
 import com.artembilous.docugen.dto.PermissionDTO;
 import com.artembilous.docugen.dto.RoleDTO;
 import com.artembilous.docugen.dto.RoleUpdateRequest;
-import com.artembilous.docugen.entity.Organisation;
-import com.artembilous.docugen.entity.Permission;
-import com.artembilous.docugen.entity.Role;
-import com.artembilous.docugen.entity.User;
+import com.artembilous.docugen.dto.UpdateMemberRolesRequest;
+import com.artembilous.docugen.entity.*;
+import com.artembilous.docugen.repository.MembershipRepository;
 import com.artembilous.docugen.repository.OrganisationRepository;
 import com.artembilous.docugen.repository.PermissionRepository;
 import com.artembilous.docugen.repository.RoleRepository;
@@ -26,6 +25,7 @@ public class RbacService {
     private final PermissionRepository permissionRepository;
     private final RoleRepository roleRepository;
     private final OrganisationRepository organisationRepository;
+    private final MembershipRepository membershipRepository;
 
     public Set<PermissionDTO> getPermissions() {
         return permissionRepository.findAll().stream()
@@ -110,5 +110,39 @@ public class RbacService {
             throw new IllegalArgumentException("Invalid permission provided");
         }
         return permissions;
+    }
+
+    @Transactional
+    @PreAuthorize("hasPermission(#orgId, 'members:manage')")
+    public void updateMemberRoles(User user, Long orgId, Long memberId, UpdateMemberRolesRequest req) {
+        Membership membership = membershipRepository
+                .findByMembershipIdAndOrganisationOrganisationId(memberId, orgId)
+                .orElseThrow(() -> new EntityNotFoundException("Membership not found"));
+
+        Set<Role> roles = roleRepository
+                .findByOrganisationOrganisationIdAndNameIn(orgId, req.roles());
+        if (roles.size() != req.roles().size()) {
+            throw new IllegalArgumentException("Invalid role provided");
+        }
+
+        boolean newAdminPresent = roles.stream()
+                .anyMatch(r -> r.getName().equals("ADMIN"));
+
+        boolean currentlyAdmin = membership.getRoles()
+                .stream()
+                .anyMatch(r -> r.getName().equals("ADMIN"));
+
+        if (currentlyAdmin && !newAdminPresent) {
+            boolean anotherAdminExists =
+                    membershipRepository.existsAnotherAdmin(orgId, memberId);
+
+            if (!anotherAdminExists) {
+                throw new IllegalStateException(
+                        "Organisation must have at least one ADMIN"
+                );
+            }
+        }
+
+        membership.setRoles(roles);
     }
 }

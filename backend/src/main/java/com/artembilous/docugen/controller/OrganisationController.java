@@ -1,12 +1,10 @@
 package com.artembilous.docugen.controller;
 
-import com.artembilous.docugen.dto.CreateOrganisationRequest;
-import com.artembilous.docugen.dto.MemberDTO;
-import com.artembilous.docugen.dto.OrganisationDTO;
-import com.artembilous.docugen.dto.RenameOrganisationRequest;
+import com.artembilous.docugen.dto.*;
 import com.artembilous.docugen.entity.User;
 import com.artembilous.docugen.exception.RegistrationIncompleteException;
 import com.artembilous.docugen.service.OrganisationService;
+import com.artembilous.docugen.service.RbacService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,6 +20,7 @@ import java.util.List;
 public class OrganisationController {
 
     private final OrganisationService orgService;
+    private final RbacService rbacService;
 
     @GetMapping("/my")
     public List<OrganisationDTO> my(@AuthenticationPrincipal User user) {
@@ -41,6 +40,11 @@ public class OrganisationController {
     @PreAuthorize("hasPermission(#orgId, 'members:manage')")
     public List<MemberDTO> getMembers(@AuthenticationPrincipal User user, @PathVariable Long orgId) {
         return orgService.getOrganisationMembers(orgId);
+    }
+
+    @PutMapping("/{orgId}/members/{memberId}/roles")
+    public void updateRoles(@AuthenticationPrincipal User user, @PathVariable Long orgId, @PathVariable Long memberId, @Valid @RequestBody UpdateMemberRolesRequest req) {
+        rbacService.updateMemberRoles(user, orgId, memberId, req);
     }
 
     @PatchMapping("/{orgId}")
