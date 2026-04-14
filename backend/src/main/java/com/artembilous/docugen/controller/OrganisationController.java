@@ -3,6 +3,7 @@ package com.artembilous.docugen.controller;
 import com.artembilous.docugen.dto.CreateOrganisationRequest;
 import com.artembilous.docugen.dto.MemberDTO;
 import com.artembilous.docugen.dto.OrganisationDTO;
+import com.artembilous.docugen.dto.RenameOrganisationRequest;
 import com.artembilous.docugen.entity.User;
 import com.artembilous.docugen.exception.RegistrationIncompleteException;
 import com.artembilous.docugen.service.OrganisationService;
@@ -40,5 +41,10 @@ public class OrganisationController {
     @PreAuthorize("hasPermission(#orgId, 'members:manage')")
     public List<MemberDTO> getMembers(@AuthenticationPrincipal User user, @PathVariable Long orgId) {
         return orgService.getOrganisationMembers(orgId);
+    }
+
+    @PatchMapping("/{orgId}")
+    public void rename(@AuthenticationPrincipal User user, @PathVariable Long orgId, @Valid @RequestBody RenameOrganisationRequest req) {
+        orgService.rename(user, orgId, req);
     }
 }

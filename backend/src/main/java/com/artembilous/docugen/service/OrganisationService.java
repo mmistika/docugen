@@ -2,6 +2,7 @@ package com.artembilous.docugen.service;
 
 import com.artembilous.docugen.dto.MemberDTO;
 import com.artembilous.docugen.dto.OrganisationDTO;
+import com.artembilous.docugen.dto.RenameOrganisationRequest;
 import com.artembilous.docugen.entity.Membership;
 import com.artembilous.docugen.entity.Organisation;
 import com.artembilous.docugen.entity.Role;
@@ -9,7 +10,10 @@ import com.artembilous.docugen.entity.User;
 import com.artembilous.docugen.repository.MembershipRepository;
 import com.artembilous.docugen.repository.OrganisationRepository;
 import com.artembilous.docugen.repository.RoleRepository;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,6 +31,7 @@ public class OrganisationService {
         return membershipRepo.findUserOrganisations(user);
     }
 
+    @Transactional
     public Organisation createOrganisation(User user, String name) {
         Organisation org = new Organisation();
         org.setName(name);
@@ -55,5 +60,19 @@ public class OrganisationService {
                         m.getRoles().stream().map(Role::getName).toList()
                 ))
                 .toList();
+    }
+
+    @Transactional
+    @PreAuthorize("hasPermission(#orgId, 'organisation:manage')")
+    public void rename(User user, Long orgId, RenameOrganisationRequest req) {
+        Organisation org = orgRepo
+                .findById(orgId)
+                .orElseThrow(() -> new EntityNotFoundException("Organisation not found"));
+
+        if (req.name() == null || req.name().isBlank()) {
+            throw new IllegalArgumentException("Name cannot be empty");
+        }
+
+        org.setName(req.name());
     }
 }
