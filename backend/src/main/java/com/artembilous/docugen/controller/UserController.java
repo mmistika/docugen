@@ -1,6 +1,7 @@
 package com.artembilous.docugen.controller;
 
 import com.artembilous.docugen.dto.CompleteRegistrationRequest;
+import com.artembilous.docugen.dto.InviteUserRequest;
 import com.artembilous.docugen.dto.MeResponse;
 import com.artembilous.docugen.entity.User;
 import com.artembilous.docugen.service.UserService;
@@ -33,5 +34,10 @@ public class UserController {
     @PostMapping("/complete-registration")
     public void complete(@AuthenticationPrincipal User user, @Valid @RequestBody CompleteRegistrationRequest req) {
         userService.completeRegistration(user, req.name(), req.surname());
+    }
+
+    @PostMapping("/invite")
+    public void invite(@AuthenticationPrincipal User user, @Valid @RequestBody InviteUserRequest req) {
+        userService.invite(user, req);
     }
 }

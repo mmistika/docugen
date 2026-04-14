@@ -5,7 +5,7 @@ CREATE TYPE document_status AS ENUM ('draft', 'final');
 -- Tables
 CREATE TABLE users (
     user_id SERIAL PRIMARY KEY,
-    auth0_id VARCHAR(255) UNIQUE NOT NULL,
+    auth0_id VARCHAR(255) UNIQUE,
     email VARCHAR(255) UNIQUE NOT NULL,
     name VARCHAR(25),
     surname VARCHAR(25),

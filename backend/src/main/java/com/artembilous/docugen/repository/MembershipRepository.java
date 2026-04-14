@@ -2,6 +2,7 @@ package com.artembilous.docugen.repository;
 
 import com.artembilous.docugen.dto.OrganisationDTO;
 import com.artembilous.docugen.entity.Membership;
+import com.artembilous.docugen.entity.Organisation;
 import com.artembilous.docugen.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,6 +13,8 @@ import java.util.Optional;
 public interface MembershipRepository extends JpaRepository<Membership, Long> {
 
     boolean existsByUser(User user);
+
+    Optional<Membership> findByUserAndOrganisation(User user, Organisation org);
 
     Optional<Membership> findByMembershipIdAndOrganisationOrganisationId(Long membershipId, Long orgId);
 
