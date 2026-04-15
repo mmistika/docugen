@@ -118,3 +118,6 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER trg_init_org_admin
     AFTER INSERT ON organisations
     FOR EACH ROW EXECUTE FUNCTION initialize_organisation_admin();
+
+-- Indexes
+CREATE INDEX idx_audit_org_timestamp ON audit_logs(organisation_id, timestamp DESC);
