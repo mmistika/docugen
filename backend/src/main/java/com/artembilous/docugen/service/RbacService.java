@@ -15,6 +15,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -26,6 +29,7 @@ public class RbacService {
     private final RoleRepository roleRepository;
     private final OrganisationRepository organisationRepository;
     private final MembershipRepository membershipRepository;
+    private final AuditService auditService;
 
     public Set<PermissionDTO> getPermissions() {
         return permissionRepository.findAll().stream()
@@ -63,6 +67,12 @@ public class RbacService {
         Set<Permission> permissions = resolvePermissions(req.permissions());
         role.setPermissions(permissions);
         roleRepository.save(role);
+
+        Map<String, Object> metadata = new HashMap<>();
+        metadata.put("orgId", orgId);
+        metadata.put("roleName", req.name());
+        metadata.put("permissions", req.permissions().stream().toList());
+        auditService.log(orgId, user, AuditEntityType.ROLE, role.getRoleId(), AuditAction.ROLE_CREATED, metadata);
     }
 
     @Transactional
@@ -78,6 +88,12 @@ public class RbacService {
 
         role.setName(req.name());
         role.setPermissions(resolvePermissions(req.permissions()));
+
+        Map<String, Object> metadata = new HashMap<>();
+        metadata.put("orgId", orgId);
+        metadata.put("roleName", req.name());
+        metadata.put("permissions", req.permissions().stream().toList());
+        auditService.log(orgId, user, AuditEntityType.ROLE, role.getRoleId(), AuditAction.ROLE_UPDATED, metadata);
     }
 
     @Transactional
@@ -92,6 +108,11 @@ public class RbacService {
                 .orElseThrow(() -> new EntityNotFoundException("Role not found"));
 
         roleRepository.delete(role);
+
+        Map<String, Object> metadata = new HashMap<>();
+        metadata.put("orgId", orgId);
+        metadata.put("roleName", roleName);
+        auditService.log(orgId, user, AuditEntityType.ROLE, role.getRoleId(), AuditAction.ROLE_DELETED, metadata);
     }
 
     private RoleDTO toDTO(Role role) {
@@ -143,6 +164,15 @@ public class RbacService {
             }
         }
 
+        List<String> newRoles = roles.stream().map(Role::getName).toList();
+
         membership.setRoles(roles);
+
+        Map<String, Object> metadata = new HashMap<>();
+        metadata.put("orgId", orgId);
+        metadata.put("memberId", memberId);
+        metadata.put("memberEmail", membership.getUser().getEmail());
+        metadata.put("newRoles", newRoles);
+        auditService.log(orgId, user, AuditEntityType.MEMBERSHIP, memberId, AuditAction.MEMBER_ROLES_UPDATED, metadata);
     }
 }

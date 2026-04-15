@@ -1,10 +1,7 @@
 package com.artembilous.docugen.service;
 
 import com.artembilous.docugen.dto.InviteUserRequest;
-import com.artembilous.docugen.entity.Membership;
-import com.artembilous.docugen.entity.Organisation;
-import com.artembilous.docugen.entity.Role;
-import com.artembilous.docugen.entity.User;
+import com.artembilous.docugen.entity.*;
 import com.artembilous.docugen.repository.MembershipRepository;
 import com.artembilous.docugen.repository.OrganisationRepository;
 import com.artembilous.docugen.repository.RoleRepository;
@@ -16,9 +13,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +26,7 @@ public class UserService {
     private final MembershipRepository membershipRepository;
     private final OrganisationRepository organisationRepository;
     private final RoleRepository roleRepository;
+    private final AuditService auditService;
 
     @Transactional
     public User getOrCreate(Jwt jwt) {
@@ -92,5 +91,11 @@ public class UserService {
                 .findByNameAndOrganisation(req.role(), org)
                 .orElseThrow(() -> new EntityNotFoundException("Role not found"));
         membership.getRoles().add(role);
+
+        Map<String, Object> metadata = new HashMap<>();
+        metadata.put("orgId", req.orgId());
+        metadata.put("userEmail", req.email());
+        metadata.put("role", req.role());
+        auditService.log(req.orgId(), inviter, AuditEntityType.USER, user.getUserId(), AuditAction.USER_INVITED, metadata);
     }
 }

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -26,6 +27,7 @@ public class DocumentService {
     private final TemplateVersionRepository versionRepository;
     private final DocumentRepository documentRepository;
     private final PdfService pdfService;
+    private final AuditService auditService;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -60,6 +62,14 @@ public class DocumentService {
             doc.setData(toJson(req.data()));
             doc.setFile(pdf);
             documentRepository.save(doc);
+
+            Map<String, Object> metadata = new HashMap<>();
+            metadata.put("templateId", template.getTemplateId());
+            metadata.put("templateName", template.getName());
+            metadata.put("documentName", doc.getName());
+            metadata.put("templateVersion", version.getVersion());
+            metadata.put("data", req.data());
+            auditService.log(orgId, user, AuditEntityType.DOCUMENT, doc.getDocumentId(), AuditAction.DOCUMENT_GENERATED, metadata);
         }
 
         return pdf;
@@ -78,7 +88,16 @@ public class DocumentService {
                 .orElseThrow(() -> new EntityNotFoundException("Document not found"));
 
         if (doc.getStatus() == DocumentStatus.FINAL) return;
+
+        DocumentStatus previousStatus = doc.getStatus();
         doc.setStatus(DocumentStatus.FINAL);
+
+        Map<String, Object> metadata = new HashMap<>();
+        metadata.put("documentId", doc.getDocumentId());
+        metadata.put("documentName", doc.getName());
+        metadata.put("previousStatus", previousStatus.name());
+        metadata.put("newStatus", DocumentStatus.FINAL.name());
+        auditService.log(orgId, user, AuditEntityType.DOCUMENT, doc.getDocumentId(), AuditAction.DOCUMENT_FINALISED, metadata);
     }
 
     @Transactional
@@ -89,7 +108,16 @@ public class DocumentService {
                 .orElseThrow(() -> new EntityNotFoundException("Document not found"));
 
         if (doc.getStatus() == DocumentStatus.DRAFT) return;
+
+        DocumentStatus previousStatus = doc.getStatus();
         doc.setStatus(DocumentStatus.DRAFT);
+
+        Map<String, Object> metadata = new HashMap<>();
+        metadata.put("documentId", doc.getDocumentId());
+        metadata.put("documentName", doc.getName());
+        metadata.put("previousStatus", previousStatus.name());
+        metadata.put("newStatus", DocumentStatus.DRAFT.name());
+        auditService.log(orgId, user, AuditEntityType.DOCUMENT, doc.getDocumentId(), AuditAction.DOCUMENT_REVERTED, metadata);
     }
 
     @Transactional
@@ -98,6 +126,12 @@ public class DocumentService {
         Document doc = documentRepository
                 .findByDocumentIdAndOrganisationOrganisationId(id, orgId)
                 .orElseThrow(() -> new EntityNotFoundException("Document not found"));
+
+        Map<String, Object> metadata = new HashMap<>();
+        metadata.put("documentId", doc.getDocumentId());
+        metadata.put("documentName", doc.getName());
+        metadata.put("documentStatus", doc.getStatus().name());
+        auditService.log(orgId, user, AuditEntityType.DOCUMENT, doc.getDocumentId(), AuditAction.DOCUMENT_VIEWED, metadata);
 
         return doc.getFile();
     }

@@ -13,7 +13,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -22,7 +24,7 @@ public class TemplateService {
 
     private final TemplateRepository templateRepository;
     private final TemplateVersionRepository versionRepository;
-    private final MembershipRepository membershipRepository;
+    private final AuditService auditService;
 
     @PreAuthorize("hasPermission(#orgId, 'template:view')")
     public List<TemplateDTO> getAll(User user, Long orgId) {
@@ -76,8 +78,9 @@ public class TemplateService {
     public Long update(User user, Long orgId, Long templateId, TemplateUpdateRequest req) {
 
         Template template;
+        boolean isNewTemplate = (templateId == null);
 
-        if (templateId == null) {
+        if (isNewTemplate) {
             template = new Template();
             template.setName(req.name());
 
@@ -99,27 +102,39 @@ public class TemplateService {
                         TemplateVersionStatus.DRAFT
                 );
 
+        int versionNumber;
         if (existingDraft.isPresent()) {
             TemplateVersion draft = existingDraft.get();
             draft.setManifest(req.manifest());
             draft.setContent(req.content());
-            return templateId;
+            versionNumber = draft.getVersion();
+        } else {
+            versionNumber = versionRepository.findLatest(template.getTemplateId())
+                    .stream()
+                    .findFirst()
+                    .map(v -> v.getVersion() + 1)
+                    .orElse(1);
+
+            TemplateVersion version = new TemplateVersion();
+            version.setTemplate(template);
+            version.setVersion(versionNumber);
+            version.setManifest(req.manifest());
+            version.setContent(req.content());
+            version.setStatus(TemplateVersionStatus.DRAFT);
+
+            versionRepository.save(version);
         }
 
-        int nextVersion = versionRepository.findLatest(template.getTemplateId())
-                .stream()
-                .findFirst()
-                .map(v -> v.getVersion() + 1)
-                .orElse(1);
+        Map<String, Object> metadata = new HashMap<>();
+        metadata.put("templateId", template.getTemplateId());
+        metadata.put("templateName", template.getName());
+        metadata.put("version", versionNumber);
 
-        TemplateVersion version = new TemplateVersion();
-        version.setTemplate(template);
-        version.setVersion(nextVersion);
-        version.setManifest(req.manifest());
-        version.setContent(req.content());
-        version.setStatus(TemplateVersionStatus.DRAFT);
-
-        versionRepository.save(version);
+        auditService.log(
+                orgId, user, AuditEntityType.TEMPLATE, template.getTemplateId(),
+                isNewTemplate? AuditAction.TEMPLATE_CREATED : AuditAction.TEMPLATE_UPDATED,
+                metadata
+        );
 
         return template.getTemplateId();
     }
@@ -144,5 +159,11 @@ public class TemplateService {
         });
 
         draft.setStatus(TemplateVersionStatus.ACTIVE);
+
+        Map<String, Object> metadata = new HashMap<>();
+        metadata.put("templateId", template.getTemplateId());
+        metadata.put("templateName", template.getName());
+        metadata.put("version", draft.getVersion());
+        auditService.log(orgId, user, AuditEntityType.TEMPLATE, template.getTemplateId(), AuditAction.TEMPLATE_PUBLISHED, metadata);
     }
 }
