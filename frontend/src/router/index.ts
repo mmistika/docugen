@@ -10,6 +10,11 @@ const routes = [
         redirect: '/dashboard',
         children: [
             {
+                path: 'profile',
+                name: 'profile',
+                component: () => import('@/views/ProfileView.vue'),
+            },
+            {
                 path: 'organisations',
                 name: 'organisations',
                 component: () => import('@/views/OrganisationsView.vue')
