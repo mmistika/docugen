@@ -39,6 +39,10 @@ const users = {
 const organisations = {
     async create(data: { name: string }): Promise<void> {
         await apiInstance.post('/org', data)
+    },
+    async my() {
+        const res = await apiInstance.get('/org/my')
+        return res.data
     }
 }
 

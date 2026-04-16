@@ -6,7 +6,20 @@ const routes = [
     {
         path: '/',
         name: 'home',
-        component: () => import('@/views/HomeView.vue')
+        component: () => import('@/components/Layout.vue'),
+        redirect: '/dashboard',
+        children: [
+            {
+                path: 'organisations',
+                name: 'organisations',
+                component: () => import('@/views/OrganisationsView.vue')
+            },
+            {
+                path: 'dashboard',
+                name: 'dashboard',
+                component: () => import('@/views/DashboardView.vue')
+            }
+        ]
     },
     {
         path: '/complete-profile',
@@ -62,7 +75,7 @@ router.beforeEach(async (to) => {
         }
 
         if (to.meta.isWizard) {
-            return { name: 'home' }
+            return { name: 'dashboard' }
         }
 
         return true
