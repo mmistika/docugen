@@ -36,12 +36,12 @@ const submit = async (): Promise<void> => {
       </div>
 
       <div class="bg-white border border-gray-300 rounded-lg p-8 shadow-sm">
-        <h1 class="text-xl font-semibold text-gray-900 mb-2">Create your organization</h1>
+        <h1 class="text-xl font-semibold text-gray-900 mb-2">Create your organisation</h1>
         <p class="text-sm text-gray-500 mb-6">Set up a workspace for your team and documents.</p>
         <form @submit.prevent="submit" class="space-y-4">
           <div>
             <label for="orgName" class="block text-sm font-medium text-gray-700 mb-1">
-              Organization Name
+              Organisation Name
             </label>
             <input
                 v-model="name"
@@ -65,7 +65,7 @@ const submit = async (): Promise<void> => {
               :disabled="!isFormValid"
               class="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-opacity mt-2"
           >
-            Create Organization
+            Create Organisation
           </button>
         </form>
 
@@ -79,7 +79,7 @@ const submit = async (): Promise<void> => {
               </div>
               <div class="ml-3">
                 <p class="text-sm text-blue-700">
-                  Have an invite? Use an invitation link to join an existing organization instead.
+                  Have an invite? Use an invitation link to join an existing organisation instead.
                 </p>
               </div>
             </div>
