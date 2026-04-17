@@ -45,12 +45,12 @@ const isActive = (path: string) => {
           <Menu v-else :size="20" />
         </button>
         <div class="flex items-center gap-2">
-          <img class="w-8 h-8 bg-gray-300 rounded" src="@/assets/images/docugen.svg" alt="Docugen Logo" />
+          <img class="w-8 h-8 rounded" src="@/assets/images/docugen.svg" alt="Docugen Logo" />
           <span class="font-semibold text-gray-900">Docugen</span>
         </div>
       </div>
       <div class="flex items-center gap-3">
-        <RouterLink to="/profile" class="hidden sm:flex items-center gap-3 text-sm text-gray-600 hover:text-gray-900">
+        <RouterLink to="/profile" class="flex items-center gap-3 text-sm text-gray-600">
           <div class="flex flex-col items-end">
             <span class="font-medium text-gray-900">
               {{ authStore.user?.name }} {{ authStore.user?.surname }}
