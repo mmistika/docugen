@@ -28,6 +28,12 @@ const routes = [
                 path: 'members',
                 name: 'members',
                 component: () => import('@/views/MembersView.vue'),
+            },
+            {
+                path: 'templates',
+                name: 'templates',
+                component: () => import('@/views/TemplatesView.vue'),
+            },
             }
         ]
     },

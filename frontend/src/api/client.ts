@@ -1,8 +1,9 @@
-import axios, { type AxiosInstance } from 'axios'
-import { auth0 } from '@/main'
-import type { MeResponse } from "@/types/user.ts"
+import axios, {type AxiosInstance} from 'axios'
+import {auth0} from '@/main'
+import type {MeResponse} from "@/types/user.ts"
 import type {Member} from "@/types/member.ts";
 import type {Organisation} from "@/types/organisation.ts";
+import type {Template, TemplateDetail} from "@/types/template.ts";
 
 const apiInstance: AxiosInstance = axios.create({
     baseURL: 'http://localhost:8080/api'
@@ -49,6 +50,12 @@ const organisations = {
     async members(orgId: number): Promise<Member[]> {
         const res = await apiInstance.get(`/org/${orgId}/members`)
         return res.data
+    },
+    templates: {
+        async all(orgId: number): Promise<Template[]> {
+            const res = await apiInstance.get(`/org/${orgId}/templates`)
+            return res.data
+        },
     }
 }
 
