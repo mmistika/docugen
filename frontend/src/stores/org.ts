@@ -25,7 +25,7 @@ export const useOrgStore = defineStore('org', {
             this.organisations = data
 
             if (!this.currentOrgId && data.length > 0) {
-                this.currentOrgId = data[0].id
+                this.currentOrgId = data[0]?.id || null
             }
         },
 

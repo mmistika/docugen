@@ -1,6 +1,8 @@
 import axios, { type AxiosInstance } from 'axios'
 import { auth0 } from '@/main'
 import type { MeResponse } from "@/types/user.ts"
+import type {Member} from "@/types/member.ts";
+import type {Organisation} from "@/types/organisation.ts";
 
 const apiInstance: AxiosInstance = axios.create({
     baseURL: 'http://localhost:8080/api'
@@ -40,8 +42,12 @@ const organisations = {
     async create(data: { name: string }): Promise<void> {
         await apiInstance.post('/org', data)
     },
-    async my() {
+    async my(): Promise<Organisation[]> {
         const res = await apiInstance.get('/org/my')
+        return res.data
+    },
+    async members(orgId: number): Promise<Member[]> {
+        const res = await apiInstance.get(`/org/${orgId}/members`)
         return res.data
     }
 }
