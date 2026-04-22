@@ -56,6 +56,29 @@ const organisations = {
             const res = await apiInstance.get(`/org/${orgId}/templates`)
             return res.data
         },
+        async getForEdit(orgId: number, id: number): Promise<TemplateDetail> {
+            const res = await apiInstance.get(`/org/${orgId}/templates/${id}/edit`)
+            return res.data
+        },
+        async create(orgId: number, data: {
+            name: string;
+            manifest: string;
+            content: string;
+        }): Promise<number> {
+            const res = await apiInstance.post(`/org/${orgId}/templates`, data)
+            return res.data
+        },
+        async update(orgId: number, id: number, data: {
+            name: string;
+            manifest: string;
+            content: string;
+        }): Promise<number> {
+            const res = await apiInstance.put(`/org/${orgId}/templates/${id}`, data)
+            return res.data
+        },
+        async publish(orgId: number, id: number): Promise<void> {
+            await apiInstance.post(`/org/${orgId}/templates/${id}/publish`)
+        }
     }
 }
 
