@@ -34,6 +34,15 @@ const routes = [
                 name: 'templates',
                 component: () => import('@/views/TemplatesView.vue'),
             },
+            {
+                path: 'templates/new',
+                name: 'template-new',
+                component: () => import('@/views/TemplateEditorView.vue'),
+            },
+            {
+                path: 'templates/:id',
+                name: 'template-id',
+                component: () => import('@/views/TemplateEditorView.vue'),
             }
         ]
     },
