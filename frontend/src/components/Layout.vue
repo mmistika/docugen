@@ -85,7 +85,7 @@ const isActive = (path: string) => {
             <div class="relative mb-3">
               <select
                   :value="orgStore.currentOrgId"
-                  @change="orgStore.setCurrentOrg(Number($event.target))"
+                  @change="orgStore.setCurrentOrg(Number(($event.target as HTMLInputElement).value))"
                   class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-white appearance-none cursor-pointer"
               >
                 <option v-for="org in orgStore.organisations" :key="org.id" :value="org.id">
