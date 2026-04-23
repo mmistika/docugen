@@ -4,6 +4,7 @@ import type {MeResponse} from "@/types/user.ts"
 import type {Member} from "@/types/member.ts";
 import type {Organisation} from "@/types/organisation.ts";
 import type {Template, TemplateDetail} from "@/types/template.ts";
+import type {Document} from "@/types/document.ts";
 
 const apiInstance: AxiosInstance = axios.create({
     baseURL: 'http://localhost:8080/api'
@@ -78,6 +79,25 @@ const organisations = {
         },
         async publish(orgId: number, id: number): Promise<void> {
             await apiInstance.post(`/org/${orgId}/templates/${id}/publish`)
+        }
+    },
+    documents: {
+        async all(orgId: number): Promise<Document[]> {
+            const res = await apiInstance.get(`/org/${orgId}/documents`)
+            return res.data
+        },
+        async view(orgId: number, id: number): Promise<Blob> {
+            const res = await apiInstance.get(
+                `/org/${orgId}/documents/${id}`,
+                { responseType: 'blob' }
+            )
+            return res.data
+        },
+        async finalise(orgId: number, id: number): Promise<void> {
+            await apiInstance.put(`/org/${orgId}/documents/${id}/finalise`)
+        },
+        async revertToDraft(orgId: number, id: number): Promise<void> {
+            await apiInstance.put(`/org/${orgId}/documents/${id}/revert`)
         }
     }
 }
