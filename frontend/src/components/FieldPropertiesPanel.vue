@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import { type Field, FIELD_TYPE_MAP } from "@/types/field";
+import {type Field, FIELD_TYPE_MAP, type FieldType} from "@/types/field";
 
 const props = defineProps<{
   activeField: Field | null;
@@ -16,7 +16,7 @@ const extraProperties = computed(() =>
 );
 
 const val = (key: string): unknown =>
-  props.activeField ? (props.activeField as Record<string, unknown>)[key] : undefined;
+  props.activeField ? (props.activeField as unknown as Record<string, unknown>)[key] : undefined;
 </script>
 
 <template>
@@ -51,7 +51,7 @@ const val = (key: string): unknown =>
               @change="emit('update', 'type', ($event.target as HTMLSelectElement).value)"
               class="w-full px-3 py-1.5 border border-gray-300 rounded text-sm"
             >
-              <option v-for="key in Object.keys(FIELD_TYPE_MAP)" :key="key" :value="key">
+              <option v-for="key in (Object.keys(FIELD_TYPE_MAP) as FieldType[])" :key="key" :value="key">
                 {{ FIELD_TYPE_MAP[key].label }}
               </option>
             </select>
