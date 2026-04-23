@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount } from "vue";
+import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import { EditorContent } from "@tiptap/vue-3";
-import { ArrowLeft, Save, FileCheck2 } from "@lucide/vue";
+import { ArrowLeft, Save, FileCheck2, ZoomIn, ZoomOut } from "@lucide/vue";
 import hljs from "highlight.js/lib/core";
 import hljsJson from "highlight.js/lib/languages/json";
 import hljsXml from "highlight.js/lib/languages/xml";
@@ -31,7 +31,6 @@ onMounted(init);
 onBeforeUnmount(destroyEditor);
 
 type Tab = "document" | "manifest" | "html";
-import { ref } from "vue";
 const activeTab = ref<Tab>("document");
 
 const TABS: { key: Tab; label: string }[] = [
@@ -39,6 +38,30 @@ const TABS: { key: Tab; label: string }[] = [
   { key: "manifest", label: "Manifest View"  },
   { key: "html",     label: "HTML View"      },
 ];
+
+const A4_W      = 794;
+const A4_H      = 1123;
+const MIN_SCALE = 0.3;
+const MAX_SCALE = 2.0;
+const scale     = ref(0.9);
+
+const sheetStyle = computed(() => ({
+  width:           `${A4_W}px`,
+  height:          `${A4_H}px`,
+  transform:       `scale(${scale.value})`,
+  transformOrigin: "top left",
+  position:        "absolute" as const,
+}));
+
+const wrapperStyle = computed(() => ({
+  width:    `${A4_W * scale.value}px`,
+  height:   `${A4_H * scale.value}px`,
+  flexShrink: 0,
+  position: "relative" as const,
+}));
+
+const documentAreaRef = ref<HTMLElement | null>(null);
+
 const highlightedManifest = computed(() =>
     hljs.highlight(manifestJson.value, { language: "json" }).value
 );
@@ -123,8 +146,8 @@ const highlightedHtml = computed(() =>
           @update:inlineFieldsExpanded="inlineFieldsExpanded = $event"
       />
       <div class="flex-1 flex flex-col overflow-hidden bg-gray-100">
-        <div class="bg-white border-b border-gray-300 px-4">
-          <nav class="flex gap-6">
+        <div class="bg-white border-b border-gray-300 px-4 flex items-center">
+          <nav class="flex gap-6 flex-1">
             <button
                 v-for="tab in TABS"
                 :key="tab.key"
@@ -139,11 +162,46 @@ const highlightedHtml = computed(() =>
               {{ tab.label }}
             </button>
           </nav>
+          <div class="flex items-center gap-2 py-2 ml-4 shrink-0">
+            <button
+                @click="scale = Math.max(MIN_SCALE, Math.round((scale - 0.1) * 100) / 100)"
+                class="p-1 rounded hover:bg-gray-100 text-gray-500"
+                title="Zoom out"
+            ><ZoomOut :size="15" /></button>
+
+            <input
+                type="range"
+                :min="MIN_SCALE"
+                :max="MAX_SCALE"
+                :step="0.05"
+                v-model.number="scale"
+                class="w-24 accent-gray-800"
+            />
+
+            <button
+                @click="scale = Math.min(MAX_SCALE, Math.round((scale + 0.1) * 100) / 100)"
+                class="p-1 rounded hover:bg-gray-100 text-gray-500"
+                title="Zoom in"
+            ><ZoomIn :size="15" /></button>
+
+            <span class="text-xs text-gray-500 w-10 text-right tabular-nums">
+              {{ Math.round(scale * 100) }}%
+            </span>
+          </div>
         </div>
-        <div class="flex-1 overflow-auto p-4 lg:p-8">
-          <div v-show="activeTab === 'document'" class="flex justify-center">
-            <div class="bg-white border border-gray-300 shadow-sm w-[210mm] min-h-[297mm] p-[20mm]">
-              <EditorContent :editor="editor" />
+        <div ref="documentAreaRef" class="flex-1 overflow-auto">
+          <div
+              v-show="activeTab === 'document'"
+              class="flex justify-center py-8 px-4"
+              :style="{ minHeight: `${A4_H * scale + 64}px` }"
+          >
+            <div :style="wrapperStyle">
+              <div
+                  :style="sheetStyle"
+                  class="bg-white border border-gray-300 shadow-sm p-[20mm]"
+              >
+                <EditorContent :editor="editor" />
+              </div>
             </div>
           </div>
           <div v-if="activeTab === 'manifest'" class="p-4 lg:p-8">
