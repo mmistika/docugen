@@ -2,9 +2,17 @@
 import { onMounted, onBeforeUnmount } from "vue";
 import { EditorContent } from "@tiptap/vue-3";
 import { ArrowLeft, Save, FileCheck2 } from "@lucide/vue";
+import hljs from "highlight.js/lib/core";
+import hljsJson from "highlight.js/lib/languages/json";
+import hljsXml from "highlight.js/lib/languages/xml";
+import "highlight.js/styles/github.css";
 import { useTemplateEditor } from "@/composables/useTemplateEditor";
 import FieldSidebar         from "@/components/FieldSidebar.vue";
 import FieldPropertiesPanel from "@/components/FieldPropertiesPanel.vue";
+
+hljs.registerLanguage("json", hljsJson);
+hljs.registerLanguage("xml",  hljsXml);
+
 
 const {
   isNew, isLoading,
@@ -31,6 +39,13 @@ const TABS: { key: Tab; label: string }[] = [
   { key: "manifest", label: "Manifest View"  },
   { key: "html",     label: "HTML View"      },
 ];
+const highlightedManifest = computed(() =>
+    hljs.highlight(manifestJson.value, { language: "json" }).value
+);
+
+const highlightedHtml = computed(() =>
+    hljs.highlight(editor.value?.getHTML() ?? "", { language: "xml" }).value
+);
 </script>
 
 <template>
@@ -131,20 +146,22 @@ const TABS: { key: Tab; label: string }[] = [
               <EditorContent :editor="editor" />
             </div>
           </div>
-          <div
-              v-if="activeTab === 'manifest'"
-              class="max-w-4xl mx-auto bg-white border border-gray-300 rounded-lg shadow-sm p-6"
-          >
-            <pre class="text-sm font-mono text-gray-700 whitespace-pre-wrap">{{ manifestJson }}</pre>
+          <div v-if="activeTab === 'manifest'" class="p-4 lg:p-8">
+            <div class="max-w-4xl mx-auto bg-white border border-gray-300 rounded-lg shadow-sm overflow-hidden">
+              <pre class="p-6 text-sm overflow-auto"><code
+                  class="language-json hljs"
+                  v-html="highlightedManifest"
+              /></pre>
+            </div>
           </div>
 
-          <div
-              v-if="activeTab === 'html'"
-              class="max-w-4xl mx-auto bg-white border border-gray-300 rounded-lg shadow-sm p-6"
-          >
-            <pre class="text-sm font-mono text-gray-700 whitespace-pre-wrap">{{
-                editor ? editor.getHTML() : ""
-              }}</pre>
+          <div v-if="activeTab === 'html'" class="p-4 lg:p-8">
+            <div class="max-w-4xl mx-auto bg-white border border-gray-300 rounded-lg shadow-sm overflow-hidden">
+              <pre class="p-6 text-sm overflow-auto"><code
+                  class="language-xml hljs font-mono whitespace-pre-wrap"
+                  v-html="highlightedHtml"
+              /></pre>
+            </div>
           </div>
         </div>
       </div>
@@ -160,4 +177,5 @@ const TABS: { key: Tab; label: string }[] = [
 <style>
 .ProseMirror { outline: none; }
 .ProseMirror p { margin-top: 0.5em; margin-bottom: 0.5em; line-height: 1.5; }
+pre code.hljs { padding: 0; background: transparent; }
 </style>
