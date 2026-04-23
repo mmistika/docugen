@@ -58,6 +58,11 @@ const routes = [
         component: () => import('@/views/RegistrationWizardStep2.vue'),
         meta: { isWizard: true }
     },
+    {
+        path: '/:pathMatch(.*)*',
+        name: 'not-found',
+        redirect: '/'
+    }
 ]
 
 const router = createRouter({
