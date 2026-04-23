@@ -1,12 +1,18 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { Search, Plus, Building2, Users } from "@lucide/vue";
-import { RouterLink } from 'vue-router';
-import { useOrgStore } from '@/stores/org';
+import {ref, computed} from 'vue';
+import {Search, Plus, Building2, Users} from "@lucide/vue";
+import {RouterLink} from 'vue-router';
+import {useOrgStore} from '@/stores/org';
+import {api} from "@/api/client.ts";
+import Modal from "@/components/Modal.vue";
 
 const orgStore = useOrgStore();
 
 const searchQuery = ref('');
+const isModalOpen = ref(false);
+const isSubmitting = ref(false);
+
+const newOrgName = ref('');
 
 const filteredOrganisations = computed(() => {
   if (!searchQuery.value) return orgStore.organisations;
@@ -17,8 +23,23 @@ const filteredOrganisations = computed(() => {
   );
 });
 
-const createOrganisation = () => {
-  //stub
+const handleClose = () => {
+  isModalOpen.value = false;
+  newOrgName.value = '';
+};
+
+const createOrganisation = async () => {
+  if (!newOrgName.value.trim() || isSubmitting.value) return;
+
+  isSubmitting.value = true;
+  try {
+    await api.organisations.create({name: newOrgName.value});
+    await orgStore.fetch();
+    handleClose();
+  } catch (error) {
+  } finally {
+    isSubmitting.value = false;
+  }
 };
 </script>
 
@@ -29,7 +50,7 @@ const createOrganisation = () => {
         <h1 class="text-2xl font-bold text-gray-900 mb-1">Organisations</h1>
       </div>
       <button
-          @click="createOrganisation"
+          @click="isModalOpen = true"
           class="px-4 py-2 bg-gray-900 text-white rounded text-sm hover:bg-gray-800 flex items-center gap-2 justify-center"
       >
         <Plus :size="16" />
@@ -111,5 +132,48 @@ const createOrganisation = () => {
         </RouterLink>
       </div>
     </div>
+
+    <Modal
+        :show="isModalOpen"
+        title="Create New Organization"
+        @close="handleClose"
+    >
+      <template #body>
+        <form @submit.prevent="createOrganisation" id="createOrgForm" class="space-y-4">
+          <div>
+            <label for="orgName" class="block text-sm font-medium text-gray-700 mb-1">
+              Organization name *
+            </label>
+            <input
+                v-model="newOrgName"
+                type="text"
+                id="orgName"
+                required
+                class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter organization name"
+                :disabled="isSubmitting"
+            />
+          </div>
+        </form>
+      </template>
+      <template #footer>
+        <button
+            @click="handleClose"
+            type="button"
+            class="px-4 py-2 border border-gray-300 rounded text-sm font-medium hover:bg-gray-50"
+            :disabled="isSubmitting"
+        >
+          Cancel
+        </button>
+        <button
+            form="createOrgForm"
+            type="submit"
+            class="px-4 py-2 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            :disabled="isSubmitting || !newOrgName.trim()"
+        >
+          {{ isSubmitting ? 'Creating...' : 'Create Organization' }}
+        </button>
+      </template>
+    </Modal>
   </div>
 </template>
