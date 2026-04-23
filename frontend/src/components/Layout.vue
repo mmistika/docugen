@@ -12,7 +12,7 @@ const orgStore = useOrgStore();
 const mobileMenuOpen = ref(false);
 
 const navigation = [
-  { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+  //{ name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
   { name: 'Organisations', path: '/organisations', icon: Building2 },
 ];
 
