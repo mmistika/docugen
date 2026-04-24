@@ -30,7 +30,7 @@ const user = authStore.user;
           </div>
         </div>
       </div>
-      <div class="p-6">
+      <div class="p-6 border-b border-gray-300">
         <h2 class="text-sm font-semibold text-gray-900 mb-4">Personal Information</h2>
         <div class="space-y-4">
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -62,6 +62,18 @@ const user = authStore.user;
                 class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded text-gray-500 cursor-not-allowed"
             />
           </div>
+        </div>
+      </div>
+      <div class="p-6">
+        <h2 class="text-sm font-semibold text-gray-900 mb-4">Session</h2>
+        <div class="flex items-start justify-between">
+          <div>
+            <p class="text-sm text-gray-700 font-medium mb-1">Log out of your account</p>
+            <p class="text-xs text-gray-500">You will need to log in again to access the platform</p>
+          </div>
+          <button @click="authStore.logout()" class="px-4 py-2 border border-red-300 text-red-700 rounded text-sm font-medium hover:bg-red-50">
+            Log out
+          </button>
         </div>
       </div>
     </div>

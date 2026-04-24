@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { api } from '@/api/client'
+import { auth0 } from '@/main'
 import type { MeResponse } from '@/types/user'
 
 interface AuthState {
@@ -26,6 +27,9 @@ export const useAuthStore = defineStore('auth', {
             if (this.user) {
                 this.user.registered = true
             }
+        },
+        async logout() {
+            await auth0.logout({ logoutParams: { returnTo: window.location.origin } })
         }
     }
 })
