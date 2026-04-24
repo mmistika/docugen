@@ -73,7 +73,7 @@ const filteredTemplates = computed(() => {
         <div class="p-4">
           <div class="flex items-start justify-between mb-4">
             <h3 class="font-medium text-gray-900 text-sm">{{ template.name }}</h3>
-            <button class="p-1 hover:bg-gray-100 rounded">
+            <button hidden class="p-1 hover:bg-gray-100 rounded">
               <MoreVertical :size="16" class="text-gray-600" />
             </button>
           </div>
@@ -100,7 +100,7 @@ const filteredTemplates = computed(() => {
               <div class="flex-1 min-w-0">
                 <h3 class="font-medium text-sm text-gray-900 truncate">{{ template.name }}</h3>
               </div>
-              <button class="p-1 ml-2">
+              <button hidden class="p-1 ml-2">
                 <MoreVertical :size="16" class="text-gray-600" />
               </button>
             </div>
