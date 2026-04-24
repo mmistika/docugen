@@ -106,10 +106,10 @@ const organisations = {
             return res.data
         },
         async finalise(orgId: number, id: number): Promise<void> {
-            await apiInstance.put(`/org/${orgId}/documents/${id}/finalise`)
+            await apiInstance.patch(`/org/${orgId}/documents/${id}/finalise`)
         },
         async revertToDraft(orgId: number, id: number): Promise<void> {
-            await apiInstance.put(`/org/${orgId}/documents/${id}/revert`)
+            await apiInstance.patch(`/org/${orgId}/documents/${id}/revert`)
         }
     }
 }
