@@ -31,7 +31,7 @@ watch(
 )
 
 const templateName = (doc: Document): string => {
-  return doc.template
+  return doc.templateName
 }
 
 const uniqueTemplates = computed(() =>
@@ -91,6 +91,11 @@ const revertToDraft = async (doc: Document) => {
 }
 
 const isFinal = (doc: Document) => doc.status === 'FINAL' as DocumentStatus
+
+const formatDate = (date: Date | string): string => {
+  const d = new Date(date)
+  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+}
 </script>
 
 <template>
@@ -168,7 +173,7 @@ const isFinal = (doc: Document) => doc.status === 'FINAL' as DocumentStatus
             </div>
           </td>
           <td class="px-6 py-4 text-sm text-gray-600">{{ templateName(doc) }}</td>
-          <td class="px-6 py-4 text-sm text-gray-600">{{ doc.created }}</td>
+          <td class="px-6 py-4 text-sm text-gray-600">{{ formatDate(doc.createdAt) }}</td>
           <td class="px-6 py-4">
               <span
                   class="inline-flex px-2 py-1 text-xs rounded-full font-medium"
@@ -236,7 +241,7 @@ const isFinal = (doc: Document) => doc.status === 'FINAL' as DocumentStatus
             {{ doc.status }}
           </span>
         </div>
-        <p class="text-xs text-gray-400 mb-3">{{ doc.created }}</p>
+        <p class="text-xs text-gray-400 mb-3">{{ formatDate(doc.createdAt) }}</p>
         <div class="flex gap-2 pt-3 border-t border-gray-100">
           <button
               @click="viewDocument(doc)"
