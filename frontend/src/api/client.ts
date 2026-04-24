@@ -86,6 +86,18 @@ const organisations = {
             const res = await apiInstance.get(`/org/${orgId}/documents`)
             return res.data
         },
+        async generate(orgId: number, data: {
+            templateId: number
+            name: string
+            data: Record<string, string>
+        }): Promise<Blob> {
+            const res = await apiInstance.post(
+                `/org/${orgId}/documents/generate`,
+                data,
+                { responseType: 'blob' }
+            )
+            return res.data
+        },
         async view(orgId: number, id: number): Promise<Blob> {
             const res = await apiInstance.get(
                 `/org/${orgId}/documents/${id}`,
