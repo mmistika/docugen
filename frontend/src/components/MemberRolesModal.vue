@@ -42,7 +42,7 @@ const submit = () => {
 <template>
   <Modal
       :show="show"
-      :title="member ? `Manage Roles — ${member.name} ${member.surname}` : 'Manage Roles'"
+      :title="member ? `Manage Roles — ${member.name ?? member.email} ${member.surname ?? ''}` : 'Manage Roles'"
       @close="emit('close')"
   >
     <template #body>
