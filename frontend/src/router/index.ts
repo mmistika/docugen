@@ -120,7 +120,7 @@ router.beforeEach(async (to) => {
         }
 
         if (to.meta.isWizard) {
-            return { name: 'dashboard' }
+            return { name: 'home' }
         }
 
         return true
