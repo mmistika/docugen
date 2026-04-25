@@ -53,6 +53,9 @@ const organisations = {
         const res = await apiInstance.get(`/org/${orgId}/members`)
         return res.data
     },
+    async rename(orgId: number, data: { name: string }) {
+        await apiInstance.patch(`/org/${orgId}`, data)
+    },
     rbac: {
         async permissions(orgId: number): Promise<PermissionDTO[]> {
             const res = await apiInstance.get(`/org/${orgId}/rbac/permissions`)
