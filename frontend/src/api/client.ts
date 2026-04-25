@@ -5,6 +5,7 @@ import type {Member} from "@/types/member.ts";
 import type {Organisation} from "@/types/organisation.ts";
 import type {Template, TemplateDetail} from "@/types/template.ts";
 import type {Document} from "@/types/document.ts";
+import type {PermissionDTO, RoleDTO, RoleUpdateRequest} from "@/types/rbac.ts";
 
 const apiInstance: AxiosInstance = axios.create({
     baseURL: 'http://localhost:8080/api'
@@ -51,6 +52,25 @@ const organisations = {
     async members(orgId: number): Promise<Member[]> {
         const res = await apiInstance.get(`/org/${orgId}/members`)
         return res.data
+    },
+    rbac: {
+        async permissions(orgId: number): Promise<PermissionDTO[]> {
+            const res = await apiInstance.get(`/org/${orgId}/rbac/permissions`)
+            return res.data
+        },
+        async roles(orgId: number): Promise<RoleDTO[]> {
+            const res = await apiInstance.get(`/org/${orgId}/rbac/roles`)
+            return res.data
+        },
+        async createRole(orgId: number, req: RoleUpdateRequest): Promise<void> {
+            await apiInstance.post(`/org/${orgId}/rbac/roles`, req)
+        },
+        async updateRole(orgId: number, req: RoleUpdateRequest): Promise<void> {
+            await apiInstance.put(`/org/${orgId}/rbac/roles`, req)
+        },
+        async deleteRole(orgId: number, roleName: string): Promise<void> {
+            await apiInstance.delete(`/org/${orgId}/rbac/roles/${roleName}`)
+        },
     },
     templates: {
         async all(orgId: number): Promise<Template[]> {

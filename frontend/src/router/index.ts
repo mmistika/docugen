@@ -19,6 +19,11 @@ const routes = [
                 name: 'organisations',
                 component: () => import('@/views/OrganisationsView.vue')
             },
+            {
+                path: 'organisations/:id/settings',
+                name: 'org-settings',
+                component: () => import('@/views/OrganisationSettingsView.vue'),
+            },
             // {
             //     path: 'dashboard',
             //     name: 'dashboard',
