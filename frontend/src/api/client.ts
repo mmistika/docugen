@@ -35,9 +35,11 @@ const users = {
         const res = await apiInstance.get<MeResponse>('/users/me')
         return res.data
     },
-
     async completeRegistration(data: { name: string; surname: string }): Promise<void> {
         await apiInstance.post('/users/complete-registration', data)
+    },
+    async invite(data: { orgId: number; email: string; role: string }): Promise<void> {
+        await apiInstance.post('/users/invite', data)
     }
 }
 
@@ -49,12 +51,17 @@ const organisations = {
         const res = await apiInstance.get('/org/my')
         return res.data
     },
-    async members(orgId: number): Promise<Member[]> {
-        const res = await apiInstance.get(`/org/${orgId}/members`)
-        return res.data
-    },
     async rename(orgId: number, data: { name: string }) {
         await apiInstance.patch(`/org/${orgId}`, data)
+    },
+    members: {
+        async all(orgId: number): Promise<Member[]> {
+            const res = await apiInstance.get(`/org/${orgId}/members`)
+            return res.data
+        },
+        async updateRoles(orgId: number, memberId: number, roles: string[]): Promise<void> {
+            await apiInstance.put(`/org/${orgId}/members/${memberId}/roles`, { roles })
+        },
     },
     rbac: {
         async permissions(orgId: number): Promise<PermissionDTO[]> {
