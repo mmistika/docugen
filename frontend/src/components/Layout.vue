@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRoute, RouterLink, RouterView } from 'vue-router';
-import { Building2, Users, FileText, Files, Menu, X, ChevronDown, LayoutDashboard } from '@lucide/vue';
+import {Building2, Users, FileText, Files, Menu, X, ChevronDown, LayoutDashboard, ScrollText} from '@lucide/vue';
 import { useAuthStore } from '@/stores/auth';
 import { useOrgStore } from "@/stores/org.ts";
 
@@ -20,6 +20,7 @@ const orgNavigation = [
   { name: 'Members', path: '/members', icon: Users },
   { name: 'Templates', path: '/templates', icon: FileText },
   { name: 'Documents', path: '/documents', icon: Files },
+  { name: 'Audit Logs', path: '/audit', icon: ScrollText },
 ];
 
 onMounted(async () => {

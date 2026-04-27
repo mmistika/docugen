@@ -6,6 +6,7 @@ import type {Organisation} from "@/types/organisation.ts";
 import type {Template, TemplateDetail} from "@/types/template.ts";
 import type {Document} from "@/types/document.ts";
 import type {PermissionDTO, RoleDTO, RoleUpdateRequest} from "@/types/rbac.ts";
+import type {AuditLogDTO} from "@/types/audit.ts";
 
 const apiInstance: AxiosInstance = axios.create({
     baseURL: 'http://localhost:8080/api'
@@ -140,6 +141,25 @@ const organisations = {
         },
         async revertToDraft(orgId: number, id: number): Promise<void> {
             await apiInstance.patch(`/org/${orgId}/documents/${id}/revert`)
+        }
+    },
+    audit: {
+        async get(orgId: number, params: {
+            page: number
+            size: number
+            from?: string
+            to?: string
+        }): Promise<{
+            content: AuditLogDTO[]
+            page: {
+                totalElements: number
+                totalPages: number
+                number: number
+                size: number
+            }
+        }> {
+            const res = await apiInstance.get(`/org/${orgId}/audit`, { params })
+            return res.data
         }
     }
 }

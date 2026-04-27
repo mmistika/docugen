@@ -58,6 +58,11 @@ const routes = [
                 path: 'documents/generate',
                 name: 'generate',
                 component: () => import('@/views/DocumentGeneratorView.vue'),
+            },
+            {
+                path: 'audit',
+                name: 'audit',
+                component: () => import('@/views/AuditView.vue'),
             }
         ]
     },
