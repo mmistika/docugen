@@ -60,7 +60,7 @@ public class TemplateService {
                 .orElseThrow(() -> new EntityNotFoundException("No template found"));
 
         TemplateVersion active = versionRepository
-                .findByTemplateTemplateIdAndStatus(templateId, TemplateVersionStatus.ACTIVE)
+.findByTemplateTemplateIdAndStatus(templateId, TemplateVersionStatus.ACTIVE.name())
                 .orElseThrow(() -> new IllegalStateException("No active version available"));
 
         return new TemplateDetailDTO(
@@ -99,7 +99,7 @@ public class TemplateService {
         Optional<TemplateVersion> existingDraft =
                 versionRepository.findByTemplateTemplateIdAndStatus(
                         template.getTemplateId(),
-                        TemplateVersionStatus.DRAFT
+                        TemplateVersionStatus.DRAFT.name()
                 );
 
         int versionNumber;
@@ -148,11 +148,11 @@ public class TemplateService {
                 .orElseThrow(() -> new EntityNotFoundException("No template found to publish"));
 
         TemplateVersion draft = versionRepository
-                .findByTemplateTemplateIdAndStatus(templateId, TemplateVersionStatus.DRAFT)
+                .findByTemplateTemplateIdAndStatus(templateId, TemplateVersionStatus.DRAFT.name())
                 .orElseThrow(() -> new IllegalStateException("No draft version to publish"));
 
         Optional<TemplateVersion> activeOpt =
-                versionRepository.findByTemplateTemplateIdAndStatus(templateId, TemplateVersionStatus.ACTIVE);
+                versionRepository.findByTemplateTemplateIdAndStatus(templateId, TemplateVersionStatus.ACTIVE.name());
 
         activeOpt.ifPresent(active -> {
             active.setStatus(TemplateVersionStatus.RETIRED);

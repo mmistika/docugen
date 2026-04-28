@@ -4,6 +4,7 @@ import com.artembilous.docugen.entity.TemplateVersion;
 import com.artembilous.docugen.entity.TemplateVersionStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
@@ -18,5 +19,6 @@ public interface TemplateVersionRepository extends JpaRepository<TemplateVersion
     """)
     Optional<TemplateVersion> findLatest(Long templateId);
 
-    Optional<TemplateVersion> findByTemplateTemplateIdAndStatus(Long templateId, TemplateVersionStatus status);
+    @Query("SELECT tv FROM TemplateVersion tv WHERE tv.template.templateId = :templateId AND CAST(tv.status AS string) = :status")
+    Optional<TemplateVersion> findByTemplateTemplateIdAndStatus(@Param("templateId") Long templateId, @Param("status") String status);
 }
