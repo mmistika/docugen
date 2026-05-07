@@ -4,7 +4,7 @@ import {Building2, Plus, Settings, Users} from "@lucide/vue";
 import {RouterLink} from 'vue-router';
 import {useOrgStore} from '@/stores/org';
 import {api} from "@/api/client.ts";
-import Modal from "@/components/modals/Modal.vue";
+import CreateOrganisationModal from "@/components/modals/CreateOrganisationModal.vue";
 import TabHeader from "@/components/common/TabHeader.vue";
 import SearchFilterBar from "@/components/common/SearchFilterBar.vue";
 import DataTable from "@/components/common/DataTable.vue";
@@ -14,8 +14,6 @@ const orgStore = useOrgStore();
 const searchQuery = ref('');
 const isModalOpen = ref(false);
 const isSubmitting = ref(false);
-
-const newOrgName = ref('');
 
 const filteredOrganisations = computed(() => {
   if (!searchQuery.value) return orgStore.organisations;
@@ -34,15 +32,14 @@ const tableHeaders = [
 
 const handleClose = () => {
   isModalOpen.value = false;
-  newOrgName.value = '';
 };
 
-const createOrganisation = async () => {
-  if (!newOrgName.value.trim() || isSubmitting.value) return;
+const createOrganisation = async (name: string) => {
+  if (isSubmitting.value) return;
 
   isSubmitting.value = true;
   try {
-    await api.organisations.create({name: newOrgName.value});
+    await api.organisations.create({name});
     await orgStore.fetch();
     handleClose();
   } catch (error) {
@@ -111,47 +108,11 @@ const createOrganisation = async () => {
       </template>
     </DataTable>
 
-    <Modal
+    <CreateOrganisationModal
         :show="isModalOpen"
-        title="Create New Organization"
+        :is-submitting="isSubmitting"
         @close="handleClose"
-    >
-      <template #body>
-        <form @submit.prevent="createOrganisation" id="createOrgForm" class="space-y-4">
-          <div>
-            <label for="orgName" class="block text-sm font-medium text-gray-700 mb-1">
-              Organization name *
-            </label>
-            <input
-                v-model="newOrgName"
-                type="text"
-                id="orgName"
-                required
-                class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter organization name"
-                :disabled="isSubmitting"
-            />
-          </div>
-        </form>
-      </template>
-      <template #footer>
-        <button
-            @click="handleClose"
-            type="button"
-            class="px-4 py-2 border border-gray-300 rounded text-sm font-medium hover:bg-gray-50"
-            :disabled="isSubmitting"
-        >
-          Cancel
-        </button>
-        <button
-            form="createOrgForm"
-            type="submit"
-            class="px-4 py-2 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            :disabled="isSubmitting || !newOrgName.trim()"
-        >
-          {{ isSubmitting ? 'Creating...' : 'Create Organization' }}
-        </button>
-      </template>
-    </Modal>
+        @create="createOrganisation"
+    />
   </div>
 </template>
