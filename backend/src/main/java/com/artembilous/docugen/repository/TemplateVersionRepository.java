@@ -19,6 +19,5 @@ public interface TemplateVersionRepository extends JpaRepository<TemplateVersion
     """)
     Optional<TemplateVersion> findLatest(Long templateId);
 
-    @Query("SELECT tv FROM TemplateVersion tv WHERE tv.template.templateId = :templateId AND CAST(tv.status AS string) = :status")
-    Optional<TemplateVersion> findByTemplateTemplateIdAndStatus(@Param("templateId") Long templateId, @Param("status") String status);
+    Optional<TemplateVersion> findByTemplateTemplateIdAndStatus(@Param("templateId") Long templateId, @Param("status") TemplateVersionStatus status);
 }

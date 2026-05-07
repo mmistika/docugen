@@ -4,7 +4,6 @@ import com.artembilous.docugen.dto.TemplateDTO;
 import com.artembilous.docugen.dto.TemplateDetailDTO;
 import com.artembilous.docugen.dto.TemplateUpdateRequest;
 import com.artembilous.docugen.entity.*;
-import com.artembilous.docugen.repository.MembershipRepository;
 import com.artembilous.docugen.repository.TemplateRepository;
 import com.artembilous.docugen.repository.TemplateVersionRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -60,7 +59,7 @@ public class TemplateService {
                 .orElseThrow(() -> new EntityNotFoundException("No template found"));
 
         TemplateVersion active = versionRepository
-.findByTemplateTemplateIdAndStatus(templateId, TemplateVersionStatus.ACTIVE.name())
+                .findByTemplateTemplateIdAndStatus(templateId, TemplateVersionStatus.ACTIVE)
                 .orElseThrow(() -> new IllegalStateException("No active version available"));
 
         return new TemplateDetailDTO(
@@ -99,7 +98,7 @@ public class TemplateService {
         Optional<TemplateVersion> existingDraft =
                 versionRepository.findByTemplateTemplateIdAndStatus(
                         template.getTemplateId(),
-                        TemplateVersionStatus.DRAFT.name()
+                        TemplateVersionStatus.DRAFT
                 );
 
         int versionNumber;
@@ -148,11 +147,11 @@ public class TemplateService {
                 .orElseThrow(() -> new EntityNotFoundException("No template found to publish"));
 
         TemplateVersion draft = versionRepository
-                .findByTemplateTemplateIdAndStatus(templateId, TemplateVersionStatus.DRAFT.name())
+                .findByTemplateTemplateIdAndStatus(templateId, TemplateVersionStatus.DRAFT)
                 .orElseThrow(() -> new IllegalStateException("No draft version to publish"));
 
         Optional<TemplateVersion> activeOpt =
-                versionRepository.findByTemplateTemplateIdAndStatus(templateId, TemplateVersionStatus.ACTIVE.name());
+                versionRepository.findByTemplateTemplateIdAndStatus(templateId, TemplateVersionStatus.ACTIVE);
 
         activeOpt.ifPresent(active -> {
             active.setStatus(TemplateVersionStatus.RETIRED);
