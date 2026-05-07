@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
-import { Eye, FileText, Plus, Search, CheckCircle, RotateCcw } from '@lucide/vue'
-import { RouterLink } from 'vue-router'
-import { useOrgStore } from '@/stores/org'
-import { api } from '@/api/client'
+import {computed, ref, watch} from 'vue'
+import {CheckCircle, Eye, FileText, Plus, RotateCcw, Search} from '@lucide/vue'
+import {RouterLink} from 'vue-router'
+import {useOrgStore} from '@/stores/org'
+import {api} from '@/api/client'
 import type {Document, DocumentStatus} from '@/types/document'
+import TabHeader from "@/components/common/TabHeader.vue";
 
 const orgStore = useOrgStore()
 
@@ -100,20 +101,15 @@ const formatDate = (date: Date | string): string => {
 
 <template>
   <div class="p-4 lg:p-8">
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-      <div>
-        <h1 class="text-2xl font-bold text-gray-900 mb-1">Documents</h1>
-        <p class="text-sm text-gray-600">Generated documents library</p>
-      </div>
-      <RouterLink
-          to="/documents/generate"
-          class="px-4 py-2 bg-gray-900 text-white rounded text-sm hover:bg-gray-800
-               flex items-center gap-2 justify-center"
-      >
-        <Plus :size="16" />
-        Generate Document
-      </RouterLink>
-    </div>
+    <TabHeader description="Generated documents library" title="Documents">
+      <template v-slot:actions>
+        <RouterLink class="px-4 py-2 bg-gray-900 text-white rounded text-sm hover:bg-gray-800 flex items-center gap-2 justify-center"
+                    to="/documents/generate">
+          <Plus :size="16"/>
+          Generate Document
+        </RouterLink>
+      </template>
+    </TabHeader>
     <div class="bg-white border border-gray-300 rounded-lg p-4 mb-6">
       <div class="flex flex-col sm:flex-row gap-3">
         <div class="flex-1 relative">

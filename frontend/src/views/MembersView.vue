@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import {computed, ref, watch} from 'vue';
-import {Plus, Search, UserCog } from "@lucide/vue";
+import {Plus, Search, UserCog} from "@lucide/vue";
 import {api} from '@/api/client';
 import type {Member} from "@/types/member.ts";
 import {useOrgStore} from "@/stores/org.ts";
 import InviteMemberModal from '@/components/InviteMemberModal.vue'
 import ManageMemberRolesModal from '@/components/MemberRolesModal.vue'
+import TabHeader from "@/components/common/TabHeader.vue";
 
 const orgStore = useOrgStore();
 
@@ -74,18 +75,15 @@ const handleSaveRoles = async (memberId: number, roles: string[]) => {
 
 <template>
   <div class="p-4 lg:p-8">
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-      <h1 class="text-2xl font-bold text-gray-900">Members</h1>
-      <button
-          @click="showInvite = true"
-          class="px-4 py-2 bg-gray-900 text-white rounded text-sm hover:bg-gray-800
-               flex items-center gap-2 justify-center transition-colors"
-      >
-        <Plus :size="16" />
-        Add Member
-      </button>
-    </div>
-
+    <TabHeader title="Members">
+      <template v-slot:actions>
+        <button class="px-4 py-2 bg-gray-900 text-white rounded text-sm hover:bg-gray-800
+               flex items-center gap-2 justify-center transition-colors" @click="showInvite = true">
+          <Plus :size="16"/>
+          Add Member
+        </button>
+      </template>
+    </TabHeader>
     <div class="bg-white border border-gray-300 rounded-lg p-4 mb-6">
       <div class="flex flex-col sm:flex-row gap-3">
         <div class="flex-1 relative">

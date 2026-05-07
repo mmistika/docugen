@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import {ref, computed} from 'vue';
-import {Search, Plus, Building2, Users} from "@lucide/vue";
+import {computed, ref} from 'vue';
+import {Building2, Plus, Search, Users} from "@lucide/vue";
 import {RouterLink} from 'vue-router';
 import {useOrgStore} from '@/stores/org';
 import {api} from "@/api/client.ts";
 import Modal from "@/components/Modal.vue";
+import TabHeader from "@/components/common/TabHeader.vue";
 
 const orgStore = useOrgStore();
 
@@ -45,19 +46,15 @@ const createOrganisation = async () => {
 
 <template>
   <div class="p-4 lg:p-8">
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-      <div>
-        <h1 class="text-2xl font-bold text-gray-900 mb-1">Organisations</h1>
-      </div>
-      <button
-          @click="isModalOpen = true"
-          class="px-4 py-2 bg-gray-900 text-white rounded text-sm hover:bg-gray-800 flex items-center gap-2 justify-center"
-      >
-        <Plus :size="16" />
-        New Organisation
-      </button>
-    </div>
-
+    <TabHeader title="Organisations">
+      <template v-slot:actions>
+        <button class="px-4 py-2 bg-gray-900 text-white rounded text-sm hover:bg-gray-800 flex items-center gap-2 justify-center"
+                @click="isModalOpen = true">
+          <Plus :size="16"/>
+          New Organisation
+        </button>
+      </template>
+    </TabHeader>
     <div class="bg-white border border-gray-300 rounded-lg p-4 mb-6">
       <div class="flex flex-col sm:flex-row gap-3">
         <div class="flex-1 relative">

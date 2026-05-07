@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { ref, computed, watch, nextTick } from 'vue'
-import { useRouter } from 'vue-router'
-import { ArrowLeft, FileText, Eye, Wand2, Loader2, ZoomIn, ZoomOut } from '@lucide/vue'
-import { api } from '@/api/client'
-import { useOrgStore } from '@/stores/org'
-import { buildInteractiveContent } from '@/utils/templateParser'
-import type { Template, TemplateDetail } from '@/types/template'
-import type { Field } from '@/types/field'
+import {computed, nextTick, ref, watch} from 'vue'
+import {useRouter} from 'vue-router'
+import {Eye, FileText, Loader2, Wand2, ZoomIn, ZoomOut} from '@lucide/vue'
+import {api} from '@/api/client'
+import {useOrgStore} from '@/stores/org'
+import {buildInteractiveContent} from '@/utils/templateParser'
+import type {Template, TemplateDetail} from '@/types/template'
+import type {Field} from '@/types/field'
+import TabHeader from "@/components/common/TabHeader.vue";
 
 
 const router   = useRouter()
@@ -196,17 +197,8 @@ watch(
 
 <template>
   <div class="p-4 lg:p-8 max-w-4xl mx-auto">
-    <RouterLink
-        to="/documents"
-        class="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 mb-6"
-    >
-      <ArrowLeft :size="16" />
-      Back to Documents
-    </RouterLink>
-    <div class="mb-8">
-      <h1 class="text-2xl font-bold text-gray-900 mb-1">Generate Document</h1>
-      <p class="text-sm text-gray-600">Select a template and fill in the details</p>
-    </div>
+    <TabHeader back-label="Back to Documents" back-to="/documents" description="Select a template and fill in the details"
+               title="Generate Document"/>
     <div class="bg-white border border-gray-300 rounded-lg p-6 space-y-6">
       <div>
         <div class="flex items-center gap-2 mb-4">

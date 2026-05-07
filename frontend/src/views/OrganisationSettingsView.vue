@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
-import { ArrowLeft, Plus, Shield, Trash2, Pencil, Lock, Save } from '@lucide/vue'
-import { api } from '@/api/client'
+import {computed, onMounted, ref} from 'vue'
+import {useRoute} from 'vue-router'
+import {Lock, Pencil, Plus, Save, Shield, Trash2} from '@lucide/vue'
+import {api} from '@/api/client'
 import RoleModal from '@/components/RoleModal.vue'
-import type { RoleDTO, PermissionDTO } from '@/types/rbac'
+import type {PermissionDTO, RoleDTO} from '@/types/rbac'
 import {useOrgStore} from "@/stores/org.ts";
+import TabHeader from "@/components/common/TabHeader.vue";
 
 const route    = useRoute()
 const orgId    = computed(() => Number(route.params.id))
@@ -127,17 +128,8 @@ const deleteRole = async (role: RoleDTO) => {
 
 <template>
   <div class="p-4 lg:p-8">
-    <RouterLink
-        to="/organizations"
-        class="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 mb-4"
-    >
-      <ArrowLeft :size="16" />
-      Back to Organizations
-    </RouterLink>
-    <div class="mb-6">
-      <h1 class="text-2xl font-bold text-gray-900 mb-1">Organization Settings</h1>
-      <p class="text-sm text-gray-600">ID: {{ orgId }}</p>
-    </div>
+    <TabHeader :description="`ID: ${orgId}`" back-label="Back to Organizations" back-to="/organizations"
+               title="Organization Settings"/>
     <div class="border-b border-gray-300 mb-6">
       <nav class="flex gap-6">
         <button

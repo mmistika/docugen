@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { useOrgStore } from '@/stores/org'
-import { api } from '@/api/client'
-import type { AuditLogDTO } from '@/types/audit'
+import {computed, ref, watch} from 'vue'
+import {useOrgStore} from '@/stores/org'
+import {api} from '@/api/client'
+import type {AuditLogDTO} from '@/types/audit'
+import TabHeader from "@/components/common/TabHeader.vue";
 
 const orgStore = useOrgStore()
 
@@ -100,12 +101,7 @@ const BADGE = 'bg-gray-100 text-gray-700 border border-gray-200'
 
 <template>
   <div class="p-4 lg:p-8">
-    <div class="mb-6">
-      <h1 class="text-2xl font-bold text-gray-900 mb-1">Audit Logs</h1>
-      <p class="text-sm text-gray-600">
-        View all actions performed within this organisation.
-      </p>
-    </div>
+    <TabHeader description="View all actions performed within this organisation." title="Audit Logs"/>
     <div class="bg-white border border-gray-300 rounded-lg p-4 mb-6">
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <div>

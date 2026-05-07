@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Camera } from "@lucide/vue";
-import { useAuthStore } from "@/stores/auth";
+import {Camera} from "@lucide/vue";
+import {useAuthStore} from "@/stores/auth";
+import TabHeader from "@/components/common/TabHeader.vue";
 
 const authStore = useAuthStore();
 const user = authStore.user;
@@ -8,10 +9,7 @@ const user = authStore.user;
 
 <template>
   <div class="p-6 max-w-4xl mx-auto">
-    <div class="mb-6">
-      <h1 class="text-2xl font-semibold text-gray-900">Profile Settings</h1>
-      <p class="text-sm text-gray-600 mt-1">Manage your personal information and account settings</p>
-    </div>
+    <TabHeader description="Manage your personal information and account settings" title="Profile Settings"/>
     <div class="bg-white border border-gray-300 rounded-lg">
       <div class="p-6 border-b border-gray-300">
         <h2 class="text-sm font-semibold text-gray-900 mb-4">Profile Picture</h2>

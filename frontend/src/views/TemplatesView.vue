@@ -5,6 +5,7 @@ import {RouterLink} from 'vue-router';
 import {api} from '@/api/client';
 import type {Template} from "@/types/template.ts";
 import {useOrgStore} from "@/stores/org.ts";
+import TabHeader from "@/components/common/TabHeader.vue";
 
 const orgStore = useOrgStore();
 
@@ -32,20 +33,15 @@ const filteredTemplates = computed(() => {
 
 <template>
   <div class="p-4 lg:p-8">
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-      <div>
-        <h1 class="text-2xl font-bold text-gray-900 mb-1">Templates</h1>
-        <p class="text-sm text-gray-600">Manage document templates</p>
-      </div>
-      <RouterLink
-          to="/templates/new"
-          class="px-4 py-2 bg-gray-900 text-white rounded text-sm hover:bg-gray-800 flex items-center gap-2 justify-center"
-      >
-        <Plus :size="16" />
-        Create Template
-      </RouterLink>
-    </div>
-
+    <TabHeader description="Manage document templates" title="Templates">
+      <template v-slot:actions>
+        <RouterLink class="px-4 py-2 bg-gray-900 text-white rounded text-sm hover:bg-gray-800 flex items-center gap-2 justify-center"
+                    to="/templates/new">
+          <Plus :size="16"/>
+          Create Template
+        </RouterLink>
+      </template>
+    </TabHeader>
     <div class="bg-white border border-gray-300 rounded-lg p-4 mb-6">
       <div class="flex flex-col sm:flex-row gap-3">
         <div class="flex-1 relative">
