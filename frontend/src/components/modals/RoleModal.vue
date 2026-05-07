@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import Modal from '@/components/Modal.vue'
-import type { RoleDTO, PermissionDTO } from '@/types/rbac'
+import {computed, ref, watch} from 'vue'
+import Modal from '@/components/modals/Modal.vue'
+import type {PermissionDTO, RoleDTO} from '@/types/rbac.ts'
 
 const props = defineProps<{
   show: boolean

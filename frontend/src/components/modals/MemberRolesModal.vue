@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-import Modal from '@/components/Modal.vue'
-import type { Member } from '@/types/member'
+import {ref, watch} from 'vue'
+import Modal from '@/components/modals/Modal.vue'
+import type {Member} from '@/types/member.ts'
 
 const props = defineProps<{
   show: boolean

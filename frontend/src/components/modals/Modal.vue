@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { X } from "@lucide/vue";
+import {X} from "@lucide/vue";
 
 defineProps<{
   show: boolean;

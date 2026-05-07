@@ -4,7 +4,7 @@ import {Building2, Plus, Search, Users} from "@lucide/vue";
 import {RouterLink} from 'vue-router';
 import {useOrgStore} from '@/stores/org';
 import {api} from "@/api/client.ts";
-import Modal from "@/components/Modal.vue";
+import Modal from "@/components/modals/Modal.vue";
 import TabHeader from "@/components/common/TabHeader.vue";
 
 const orgStore = useOrgStore();

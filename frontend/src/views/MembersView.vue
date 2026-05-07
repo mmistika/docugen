@@ -4,8 +4,8 @@ import {Plus, Search, UserCog} from "@lucide/vue";
 import {api} from '@/api/client';
 import type {Member} from "@/types/member.ts";
 import {useOrgStore} from "@/stores/org.ts";
-import InviteMemberModal from '@/components/InviteMemberModal.vue'
-import ManageMemberRolesModal from '@/components/MemberRolesModal.vue'
+import InviteMemberModal from '@/components/modals/InviteMemberModal.vue'
+import ManageMemberRolesModal from '@/components/modals/MemberRolesModal.vue'
 import TabHeader from "@/components/common/TabHeader.vue";
 
 const orgStore = useOrgStore();

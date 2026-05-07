@@ -3,7 +3,7 @@ import {computed, onMounted, ref} from 'vue'
 import {useRoute} from 'vue-router'
 import {Lock, Pencil, Plus, Save, Shield, Trash2} from '@lucide/vue'
 import {api} from '@/api/client'
-import RoleModal from '@/components/RoleModal.vue'
+import RoleModal from '@/components/modals/RoleModal.vue'
 import type {PermissionDTO, RoleDTO} from '@/types/rbac'
 import {useOrgStore} from "@/stores/org.ts";
 import TabHeader from "@/components/common/TabHeader.vue";
