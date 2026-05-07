@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import {computed, ref, watch} from 'vue'
-import {CheckCircle, Eye, FileText, Plus, RotateCcw, Search} from '@lucide/vue'
+import {CheckCircle, Eye, FileText, Plus, RotateCcw} from '@lucide/vue'
 import {RouterLink} from 'vue-router'
 import {useOrgStore} from '@/stores/org'
 import {api} from '@/api/client'
 import type {Document, DocumentStatus} from '@/types/document'
 import TabHeader from "@/components/common/TabHeader.vue";
+import SearchFilterBar from "@/components/common/SearchFilterBar.vue";
 
 const orgStore = useOrgStore()
 
 const documents = ref<Document[]>([])
-const searchQuery       = ref('')
+const searchQuery = ref('')
 const selectedTemplate  = ref<string>('')
 const selectedStatus    = ref<string>('')
 const isLoading         = ref(true)
@@ -110,18 +111,8 @@ const formatDate = (date: Date | string): string => {
         </RouterLink>
       </template>
     </TabHeader>
-    <div class="bg-white border border-gray-300 rounded-lg p-4 mb-6">
-      <div class="flex flex-col sm:flex-row gap-3">
-        <div class="flex-1 relative">
-          <Search :size="16" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          <input
-              v-model="searchQuery"
-              type="text"
-              placeholder="Search documents..."
-              class="w-full pl-9 pr-4 py-2 border border-gray-300 rounded text-sm
-                   focus:outline-none focus:ring-2 focus:ring-gray-300"
-          />
-        </div>
+    <SearchFilterBar v-model="searchQuery" placeholder="Search documents...">
+      <template v-slot:filters>
         <select
             v-model="selectedTemplate"
             class="px-4 py-2 border border-gray-300 rounded text-sm bg-white"
@@ -136,8 +127,8 @@ const formatDate = (date: Date | string): string => {
           <option value="">All Status</option>
           <option v-for="s in uniqueStatuses" :key="s" :value="s">{{ s }}</option>
         </select>
-      </div>
-    </div>
+      </template>
+    </SearchFilterBar>
     <div v-if="isLoading" class="text-center py-12 text-sm text-gray-500">
       Loading documents…
     </div>

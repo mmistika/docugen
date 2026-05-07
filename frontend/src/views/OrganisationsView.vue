@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import {computed, ref} from 'vue';
-import {Building2, Plus, Search, Users} from "@lucide/vue";
+import {Building2, Plus, Users} from "@lucide/vue";
 import {RouterLink} from 'vue-router';
 import {useOrgStore} from '@/stores/org';
 import {api} from "@/api/client.ts";
 import Modal from "@/components/modals/Modal.vue";
 import TabHeader from "@/components/common/TabHeader.vue";
+import SearchFilterBar from "@/components/common/SearchFilterBar.vue";
 
 const orgStore = useOrgStore();
 
@@ -55,19 +56,7 @@ const createOrganisation = async () => {
         </button>
       </template>
     </TabHeader>
-    <div class="bg-white border border-gray-300 rounded-lg p-4 mb-6">
-      <div class="flex flex-col sm:flex-row gap-3">
-        <div class="flex-1 relative">
-          <Search :size="16" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          <input
-              v-model="searchQuery"
-              type="text"
-              placeholder="Search organisations..."
-              class="w-full pl-9 pr-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-      </div>
-    </div>
+    <SearchFilterBar v-model="searchQuery" placeholder="Search organisations..."/>
     <div v-if="filteredOrganisations.length === 0" class="text-center py-12 bg-white border border-dashed border-gray-300 rounded-lg">
       <p class="text-gray-500">No organisations found.</p>
     </div>

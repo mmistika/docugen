@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import {computed, ref, watch} from 'vue';
-import {Edit, FileText, MoreVertical, Plus, Search} from '@lucide/vue';
+import {Edit, FileText, MoreVertical, Plus} from '@lucide/vue';
 import {RouterLink} from 'vue-router';
 import {api} from '@/api/client';
 import type {Template} from "@/types/template.ts";
 import {useOrgStore} from "@/stores/org.ts";
 import TabHeader from "@/components/common/TabHeader.vue";
+import SearchFilterBar from "@/components/common/SearchFilterBar.vue";
 
 const orgStore = useOrgStore();
 
@@ -42,19 +43,7 @@ const filteredTemplates = computed(() => {
         </RouterLink>
       </template>
     </TabHeader>
-    <div class="bg-white border border-gray-300 rounded-lg p-4 mb-6">
-      <div class="flex flex-col sm:flex-row gap-3">
-        <div class="flex-1 relative">
-          <Search :size="16" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          <input
-              v-model="searchQuery"
-              type="text"
-              placeholder="Search templates..."
-              class="w-full pl-9 pr-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-      </div>
-    </div>
+    <SearchFilterBar v-model="searchQuery" placeholder="Search templates..."/>
     <div v-if="isLoading" class="text-center py-12 text-gray-500">Loading templates...</div>
     <div v-else-if="filteredTemplates.length === 0" class="text-center py-12 bg-white border border-dashed border-gray-300 rounded-lg">
       <p class="text-gray-500">No templates found.</p>

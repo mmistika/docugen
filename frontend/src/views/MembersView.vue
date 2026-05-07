@@ -1,17 +1,19 @@
 <script setup lang="ts">
 import {computed, ref, watch} from 'vue';
-import {Plus, Search, UserCog} from "@lucide/vue";
+import {Plus, UserCog} from "@lucide/vue";
 import {api} from '@/api/client';
 import type {Member} from "@/types/member.ts";
 import {useOrgStore} from "@/stores/org.ts";
 import InviteMemberModal from '@/components/modals/InviteMemberModal.vue'
 import ManageMemberRolesModal from '@/components/modals/MemberRolesModal.vue'
 import TabHeader from "@/components/common/TabHeader.vue";
+import SearchFilterBar from "@/components/common/SearchFilterBar.vue";
 
 const orgStore = useOrgStore();
 
 const members = ref<Member[]>([]);
 const orgRoles      = ref<string[]>([])
+
 const searchQuery = ref('');
 const selectedRole = ref('All Roles');
 
@@ -84,18 +86,8 @@ const handleSaveRoles = async (memberId: number, roles: string[]) => {
         </button>
       </template>
     </TabHeader>
-    <div class="bg-white border border-gray-300 rounded-lg p-4 mb-6">
-      <div class="flex flex-col sm:flex-row gap-3">
-        <div class="flex-1 relative">
-          <Search :size="16" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          <input
-              v-model="searchQuery"
-              type="text"
-              placeholder="Search members by name or email..."
-              class="w-full pl-9 pr-4 py-2 border border-gray-300 rounded text-sm
-                   focus:outline-none focus:ring-2 focus:ring-gray-300"
-          />
-        </div>
+    <SearchFilterBar v-model="searchQuery" placeholder="Search members by name or email...">
+      <template v-slot:filters>
         <select
             v-model="selectedRole"
             class="px-4 py-2 border border-gray-300 rounded text-sm bg-white outline-none
@@ -106,9 +98,8 @@ const handleSaveRoles = async (memberId: number, roles: string[]) => {
             {{ role }}
           </option>
         </select>
-      </div>
-    </div>
-
+      </template>
+    </SearchFilterBar>
     <div class="hidden lg:block bg-white border border-gray-300 rounded-lg overflow-hidden">
       <table class="w-full">
         <thead class="bg-gray-50 border-b border-gray-300">
