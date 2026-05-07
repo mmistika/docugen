@@ -7,6 +7,7 @@ import {api} from '@/api/client'
 import type {Document, DocumentStatus} from '@/types/document'
 import TabHeader from "@/components/common/TabHeader.vue";
 import SearchFilterBar from "@/components/common/SearchFilterBar.vue";
+import DataTable from "@/components/common/DataTable.vue";
 
 const orgStore = useOrgStore()
 
@@ -14,8 +15,16 @@ const documents = ref<Document[]>([])
 const searchQuery = ref('')
 const selectedTemplate  = ref<string>('')
 const selectedStatus    = ref<string>('')
-const isLoading         = ref(true)
 
+const tableHeaders = [
+  {key: 'document', label: 'Document'},
+  {key: 'templateName', label: 'Template'},
+  {key: 'createdAt', label: 'Date'},
+  {key: 'status', label: 'Status'},
+  {key: 'actions', label: 'Actions'}
+]
+
+const isLoading         = ref(true)
 const actionLoading     = ref<Record<number, boolean>>({})
 
 watch(
@@ -129,110 +138,83 @@ const formatDate = (date: Date | string): string => {
         </select>
       </template>
     </SearchFilterBar>
-    <div v-if="isLoading" class="text-center py-12 text-sm text-gray-500">
-      Loading documents…
-    </div>
-    <div
-        v-else-if="filteredDocuments.length === 0"
-        class="text-center py-12 bg-white border border-dashed border-gray-300 rounded-lg"
-    >
-      <p class="text-gray-500">No documents found matching your criteria.</p>
-    </div>
-    <div v-else class="hidden lg:block bg-white border border-gray-300 rounded-lg overflow-hidden">
-      <table class="w-full">
-        <thead class="bg-gray-50 border-b border-gray-300">
-        <tr>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Document</th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Template</th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Date</th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Status</th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Actions</th>
-        </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-200">
-        <tr v-for="doc in filteredDocuments" :key="doc.id" class="hover:bg-gray-50">
-          <td class="px-6 py-4">
-            <div class="flex items-center gap-3">
-              <div class="w-8 h-8 bg-gray-100 rounded flex items-center justify-center shrink-0">
-                <FileText :size="16" class="text-gray-500" />
-              </div>
-              <span class="font-medium text-sm text-gray-900">{{ doc.name }}</span>
-            </div>
-          </td>
-          <td class="px-6 py-4 text-sm text-gray-600">{{ templateName(doc) }}</td>
-          <td class="px-6 py-4 text-sm text-gray-600">{{ formatDate(doc.createdAt) }}</td>
-          <td class="px-6 py-4">
-              <span
-                  class="inline-flex px-2 py-1 text-xs rounded-full font-medium"
-                  :class="isFinal(doc)
+    <DataTable :headers="tableHeaders" :items="filteredDocuments">
+      <!-- Desktop -->
+      <template #cell:document="{ item }">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 bg-gray-100 rounded flex items-center justify-center shrink-0">
+            <FileText :size="16" class="text-gray-500"/>
+          </div>
+          <span class="font-medium text-sm text-gray-900">{{ item.name }}</span>
+        </div>
+      </template>
+      <template #cell:createdAt="{ item }">
+        {{ formatDate(item.createdAt) }}
+      </template>
+      <template #cell:status="{ item }">
+        <span
+            :class="isFinal(item)
                   ? 'bg-green-100 text-green-800'
                   : 'bg-yellow-100 text-yellow-800'"
-              >
-                {{ doc.status }}
+            class="inline-flex px-2 py-1 text-xs rounded-full font-medium">
+                {{ item.status }}
               </span>
-          </td>
-          <td class="px-6 py-4">
-            <div class="flex items-center gap-1">
-              <button
-                  @click="viewDocument(doc)"
-                  :disabled="!!actionLoading[doc.id]"
-                  title="View PDF"
-                  class="p-1.5 hover:bg-gray-100 rounded transition-colors disabled:opacity-40"
-              >
-                <Eye :size="15" class="text-gray-600" />
-              </button>
-              <button
-                  v-if="!isFinal(doc)"
-                  @click="finalise(doc)"
-                  :disabled="!!actionLoading[doc.id]"
-                  title="Finalise document"
-                  class="p-1.5 hover:bg-green-50 rounded transition-colors disabled:opacity-40"
-              >
-                <CheckCircle :size="15" class="text-green-600" />
-              </button>
-              <button
-                  v-if="isFinal(doc)"
-                  @click="revertToDraft(doc)"
-                  :disabled="!!actionLoading[doc.id]"
-                  title="Revert to draft"
-                  class="p-1.5 hover:bg-yellow-50 rounded transition-colors disabled:opacity-40"
-              >
-                <RotateCcw :size="15" class="text-yellow-600" />
-              </button>
-            </div>
-          </td>
-        </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="lg:hidden space-y-3">
-      <div
-          v-for="doc in filteredDocuments"
-          :key="doc.id"
-          class="bg-white border border-gray-300 rounded-lg p-4"
-      >
+      </template>
+      <template #cell:actions="{ item }">
+        <div class="flex items-center gap-1">
+          <button
+              :disabled="!!actionLoading[item.id]"
+              class="p-1.5 hover:bg-gray-100 rounded transition-colors disabled:opacity-40"
+              title="View PDF"
+              @click="viewDocument(item)"
+          >
+            <Eye :size="15" class="text-gray-600"/>
+          </button>
+          <button
+              v-if="!isFinal(item)"
+              :disabled="!!actionLoading[item.id]"
+              class="p-1.5 hover:bg-green-50 rounded transition-colors disabled:opacity-40"
+              title="Finalise document"
+              @click="finalise(item)"
+          >
+            <CheckCircle :size="15" class="text-green-600"/>
+          </button>
+          <button
+              v-if="isFinal(item)"
+              :disabled="!!actionLoading[item.id]"
+              class="p-1.5 hover:bg-yellow-50 rounded transition-colors disabled:opacity-40"
+              title="Revert to draft"
+              @click="revertToDraft(item)"
+          >
+            <RotateCcw :size="15" class="text-yellow-600"/>
+          </button>
+        </div>
+      </template>
+
+      <!-- Mobile -->
+      <template #mobile-item="{ item }">
         <div class="flex items-start gap-3 mb-3">
           <div class="w-10 h-10 bg-gray-100 rounded flex items-center justify-center shrink-0">
             <FileText :size="18" class="text-gray-500" />
           </div>
           <div class="flex-1 min-w-0">
-            <h3 class="font-medium text-sm text-gray-900 mb-0.5 truncate">{{ doc.name }}</h3>
-            <p class="text-xs text-gray-500">{{ templateName(doc) }}</p>
+            <h3 class="font-medium text-sm text-gray-900 mb-0.5 truncate">{{ item.name }}</h3>
+            <p class="text-xs text-gray-500">{{ item.templateName }}</p>
           </div>
           <span
               class="shrink-0 inline-flex px-2 py-1 text-xs rounded-full font-medium"
-              :class="isFinal(doc)
+              :class="isFinal(item)
               ? 'bg-green-100 text-green-800'
               : 'bg-yellow-100 text-yellow-800'"
           >
-            {{ doc.status }}
+            {{ item.status }}
           </span>
         </div>
-        <p class="text-xs text-gray-400 mb-3">{{ formatDate(doc.createdAt) }}</p>
+        <p class="text-xs text-gray-400 mb-3">{{ formatDate(item.createdAt) }}</p>
         <div class="flex gap-2 pt-3 border-t border-gray-100">
           <button
-              @click="viewDocument(doc)"
-              :disabled="!!actionLoading[doc.id]"
+              :disabled="!!actionLoading[item.id]"
+              @click="viewDocument(item)"
               class="flex-1 px-3 py-1.5 border border-gray-300 rounded text-xs
                    hover:bg-gray-50 flex items-center justify-center gap-1.5
                    disabled:opacity-40 transition-colors"
@@ -241,9 +223,9 @@ const formatDate = (date: Date | string): string => {
             View
           </button>
           <button
-              v-if="!isFinal(doc)"
-              @click="finalise(doc)"
-              :disabled="!!actionLoading[doc.id]"
+              v-if="!isFinal(item)"
+              :disabled="!!actionLoading[item.id]"
+              @click="finalise(item)"
               class="flex-1 px-3 py-1.5 border border-green-300 text-green-700 rounded text-xs
                    hover:bg-green-50 flex items-center justify-center gap-1.5
                    disabled:opacity-40 transition-colors"
@@ -252,9 +234,9 @@ const formatDate = (date: Date | string): string => {
             Finalise
           </button>
           <button
-              v-if="isFinal(doc)"
-              @click="revertToDraft(doc)"
-              :disabled="!!actionLoading[doc.id]"
+              v-if="isFinal(item)"
+              :disabled="!!actionLoading[item.id]"
+              @click="revertToDraft(item)"
               class="flex-1 px-3 py-1.5 border border-yellow-300 text-yellow-700 rounded text-xs
                    hover:bg-yellow-50 flex items-center justify-center gap-1.5
                    disabled:opacity-40 transition-colors"
@@ -263,7 +245,7 @@ const formatDate = (date: Date | string): string => {
             Draft Back
           </button>
         </div>
-      </div>
-    </div>
+      </template>
+    </DataTable>
   </div>
 </template>

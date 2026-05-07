@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import {computed, ref} from 'vue';
-import {Building2, Plus, Users} from "@lucide/vue";
+import {Building2, Plus, Settings, Users} from "@lucide/vue";
 import {RouterLink} from 'vue-router';
 import {useOrgStore} from '@/stores/org';
 import {api} from "@/api/client.ts";
 import Modal from "@/components/modals/Modal.vue";
 import TabHeader from "@/components/common/TabHeader.vue";
 import SearchFilterBar from "@/components/common/SearchFilterBar.vue";
+import DataTable from "@/components/common/DataTable.vue";
 
 const orgStore = useOrgStore();
 
@@ -24,6 +25,12 @@ const filteredOrganisations = computed(() => {
       org.name.toLowerCase().includes(query)
   );
 });
+
+const tableHeaders = [
+  {key: 'organisation', label: 'Organisation'},
+  {key: 'memberCount', label: 'Members'},
+  {key: 'actions', label: 'Actions'}
+]
 
 const handleClose = () => {
   isModalOpen.value = false;
@@ -57,67 +64,52 @@ const createOrganisation = async () => {
       </template>
     </TabHeader>
     <SearchFilterBar v-model="searchQuery" placeholder="Search organisations..."/>
-    <div v-if="filteredOrganisations.length === 0" class="text-center py-12 bg-white border border-dashed border-gray-300 rounded-lg">
-      <p class="text-gray-500">No organisations found.</p>
-    </div>
-    <div v-else class="hidden lg:block bg-white border border-gray-300 rounded-lg overflow-hidden">
-      <table class="w-full">
-        <thead class="bg-gray-50 border-b border-gray-300">
-        <tr>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Organisation</th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Members</th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Actions</th>
-        </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-200">
-        <tr v-for="org in filteredOrganisations" :key="org.id" class="hover:bg-gray-50">
-          <td class="px-6 py-4">
-            <RouterLink :to="`/organisations/${org.id}`" class="flex items-center gap-3 hover:underline">
-              <div class="w-10 h-10 bg-gray-300 rounded flex items-center justify-center">
-                <Building2 :size="20" class="text-gray-600" />
-              </div>
-              <span class="font-medium text-gray-900">{{ org.name }}</span>
-            </RouterLink>
-          </td>
-          <td class="px-6 py-4 text-sm text-gray-600">
-            {{ org.memberCount}}
-          </td>
-          <td class="px-6 py-4">
-            <RouterLink :to="`/organisations/${org.id}/settings`" class="text-sm text-gray-600 hover:text-gray-900">
-              Settings
-            </RouterLink>
-          </td>
-        </tr>
-        </tbody>
-      </table>
-    </div>
-    <div v-if="filteredOrganisations.length > 0" class="lg:hidden space-y-3">
-      <div
-          v-for="org in filteredOrganisations"
-          :key="org.id"
-          class="relative block bg-white border border-gray-300 rounded-lg p-4 hover:shadow"
-      >
-        <RouterLink :to="`/organisations/${org.id}`" class="block">
+    <DataTable :headers="tableHeaders" :items="filteredOrganisations">
+      <!-- Desktop -->
+      <template #cell:organisation="{ item }">
+        <RouterLink :to="`/organisations/${item.id}`" class="flex items-center gap-3 hover:underline">
+          <div class="w-10 h-10 bg-gray-300 rounded flex items-center justify-center">
+            <Building2 :size="20" class="text-gray-600"/>
+          </div>
+          <span class="font-medium text-gray-900">{{ item.name }}</span>
+        </RouterLink>
+      </template>
+
+      <template #cell:actions="{ item }">
+        <RouterLink
+            :to="`/organisations/${item.id}/settings`"
+            class="flex items-center gap-1.5 whitespace-nowrap p-1.5 text-sm text-gray-600 hover:bg-gray-200 rounded transition-colors w-fit"
+        >
+          <Settings :size="15"/>
+          <span>Settings</span>
+        </RouterLink>
+      </template>
+
+      <!-- Mobile -->
+      <template #mobile-item="{ item }">
+        <RouterLink :to="`/organisations/${item.id}`" class="block">
           <div class="flex items-start justify-between mb-3">
             <div class="flex items-center gap-3">
               <div class="w-12 h-12 bg-gray-300 rounded flex items-center justify-center">
                 <Building2 :size="20" class="text-gray-600" />
               </div>
-              <div class="font-medium text-gray-900">{{ org.name }}</div>
+              <div class="font-medium text-gray-900">{{ item.name }}</div>
             </div>
           </div>
           <div class="flex gap-4 text-sm">
             <div class="flex items-center gap-1 text-gray-600">
               <Users :size="14" />
-              <span>{{ org.memberCount }} members</span>
+              <span>{{ item.memberCount }} members</span>
             </div>
           </div>
         </RouterLink>
-        <RouterLink :to="`/organisations/${org.id}/settings`" class="absolute top-4 right-4 text-sm text-gray-600 hover:text-gray-900">
-          Settings
+        <RouterLink :to="`/organisations/${item.id}/settings`"
+                    class="absolute top-4 right-4 flex items-center gap-1.5 whitespace-nowrap p-1.5 text-sm text-gray-600 hover:bg-gray-200 rounded transition-colors w-fit">
+          <Settings :size="15"/>
+          <span>Settings</span>
         </RouterLink>
-      </div>
-    </div>
+      </template>
+    </DataTable>
 
     <Modal
         :show="isModalOpen"
