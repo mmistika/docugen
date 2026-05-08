@@ -31,6 +31,7 @@ public class RbacService {
     private final MembershipRepository membershipRepository;
     private final AuditService auditService;
 
+    @Transactional
     public Set<PermissionDTO> getPermissions() {
         return permissionRepository.findAll().stream()
                 .map(p -> new PermissionDTO(
@@ -39,6 +40,7 @@ public class RbacService {
                 )).collect(Collectors.toSet());
     }
 
+    @Transactional
     @PreAuthorize("hasPermission(#orgId, 'organisation:manage')")
     public Set<RoleDTO> getRoles(User user, Long orgId) {
         return roleRepository.findByOrganisationOrganisationId(orgId)

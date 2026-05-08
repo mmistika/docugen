@@ -54,6 +54,7 @@ public class OrganisationService {
         return org;
     }
 
+    @Transactional
     public List<MemberDTO> getOrganisationMembers(Long orgId) {
         List<Membership> memberships = membershipRepo.findByOrganisationOrganisationId(orgId);
         return memberships.stream()
