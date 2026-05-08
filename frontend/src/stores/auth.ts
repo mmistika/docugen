@@ -1,7 +1,7 @@
-import { defineStore } from 'pinia'
-import { api } from '@/api/client'
-import { auth0 } from '@/main'
-import type { MeResponse } from '@/types/user'
+import {defineStore} from 'pinia'
+import {api} from '@/api/client'
+import {auth0} from '@/auth'
+import type {MeResponse} from '@/types/user'
 
 interface AuthState {
     user: MeResponse | null

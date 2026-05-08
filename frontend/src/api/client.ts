@@ -1,5 +1,5 @@
 import axios, {type AxiosInstance} from 'axios'
-import {auth0} from '@/main'
+import {auth0} from '@/auth'
 import type {MeResponse} from "@/types/user.ts"
 import type {Member} from "@/types/member.ts";
 import type {Organisation} from "@/types/organisation.ts";
