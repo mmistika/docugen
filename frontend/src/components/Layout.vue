@@ -1,16 +1,7 @@
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue';
 import { RouterLink, RouterView, useRoute } from 'vue-router';
-import {
-    Building2,
-    ChevronDown,
-    Files,
-    FileText,
-    Menu,
-    ScrollText,
-    Users,
-    X
-} from '@lucide/vue';
+import { Building2, ChevronDown, Files, FileText, Menu, ScrollText, Users, X } from '@lucide/vue';
 import { useAuthStore } from '@/stores/auth';
 import { useOrgStore } from '@/stores/org.ts';
 
@@ -190,7 +181,10 @@ const isActive = (path: string) => {
                                 class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-white"
                                 @change="
                                     orgStore.setCurrentOrg(
-                                        Number($event.target)
+                                        Number(
+                                            ($event.target as HTMLInputElement)
+                                                .value
+                                        )
                                     )
                                 "
                             >
