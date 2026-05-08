@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Type, Hash } from "@lucide/vue";
-import type { FieldTypeDef } from "@/types/field";
+import {Hash, Type} from "@lucide/vue";
+import type {FieldTypeDef} from "@/types/field.ts";
 
 defineProps<{
   def: FieldTypeDef;

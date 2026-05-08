@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import {type Field, FIELD_TYPE_MAP, type FieldType} from "@/types/field";
+import {computed} from "vue";
+import {type Field, FIELD_TYPE_MAP, type FieldType} from "@/types/field.ts";
 
 const props = defineProps<{
   activeField: Field | null;

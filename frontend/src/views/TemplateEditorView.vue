@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount } from "vue";
-import { EditorContent } from "@tiptap/vue-3";
-import { ArrowLeft, Save, FileCheck2, ZoomIn, ZoomOut } from "@lucide/vue";
+import {computed, onBeforeUnmount, onMounted, ref} from "vue";
+import {EditorContent} from "@tiptap/vue-3";
+import {ArrowLeft, FileCheck2, Save, ZoomIn, ZoomOut} from "@lucide/vue";
 import hljs from "highlight.js/lib/core";
 import hljsJson from "highlight.js/lib/languages/json";
 import hljsXml from "highlight.js/lib/languages/xml";
 import "highlight.js/styles/github.css";
-import { useTemplateEditor } from "@/composables/useTemplateEditor";
-import FieldSidebar         from "@/components/FieldSidebar.vue";
-import FieldPropertiesPanel from "@/components/FieldPropertiesPanel.vue";
+import {useTemplateEditor} from "@/composables/useTemplateEditor";
+import FieldSidebar from "@/components/editor/FieldSidebar.vue";
+import FieldPropertiesPanel from "@/components/editor/FieldPropertiesPanel.vue";
 
 hljs.registerLanguage("json", hljsJson);
 hljs.registerLanguage("xml",  hljsXml);

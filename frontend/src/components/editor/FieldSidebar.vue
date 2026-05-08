@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ChevronRight, ChevronDown } from "@lucide/vue";
-import { FIELD_TYPE_REGISTRY } from "@/types/field";
+import {ChevronDown, ChevronRight} from "@lucide/vue";
+import type {Field, FieldType} from "@/types/field.ts";
+import {FIELD_TYPE_REGISTRY} from "@/types/field.ts";
 import FieldTypeButton from "./FieldTypeButton.vue";
-import type { Field, FieldType } from "@/types/field";
 
 defineProps<{
   globalFields: Field[];
