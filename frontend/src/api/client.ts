@@ -9,7 +9,7 @@ import type {PermissionDTO, RoleDTO, RoleUpdateRequest} from "@/types/rbac.ts";
 import type {AuditLogDTO} from "@/types/audit.ts";
 
 const apiInstance: AxiosInstance = axios.create({
-    baseURL: 'http://localhost:8080/api'
+    baseURL: import.meta.env.VITE_API_URL
 })
 
 apiInstance.interceptors.request.use(async (config) => {
