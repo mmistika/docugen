@@ -1,6 +1,6 @@
-import {createRouter, createWebHistory} from 'vue-router'
-import {useAuthStore} from '@/stores/auth'
-import {auth0} from '@/auth'
+import { createRouter, createWebHistory } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
+import { auth0 } from '@/auth';
 
 const routes = [
     {
@@ -12,7 +12,7 @@ const routes = [
             {
                 path: 'profile',
                 name: 'profile',
-                component: () => import('@/views/ProfileView.vue'),
+                component: () => import('@/views/ProfileView.vue')
             },
             {
                 path: 'organisations',
@@ -22,7 +22,7 @@ const routes = [
             {
                 path: 'organisations/:id/settings',
                 name: 'org-settings',
-                component: () => import('@/views/OrganisationSettingsView.vue'),
+                component: () => import('@/views/OrganisationSettingsView.vue')
             },
             // {
             //     path: 'dashboard',
@@ -32,37 +32,37 @@ const routes = [
             {
                 path: 'members',
                 name: 'members',
-                component: () => import('@/views/MembersView.vue'),
+                component: () => import('@/views/MembersView.vue')
             },
             {
                 path: 'templates',
                 name: 'templates',
-                component: () => import('@/views/TemplatesView.vue'),
+                component: () => import('@/views/TemplatesView.vue')
             },
             {
                 path: 'templates/new',
                 name: 'template-new',
-                component: () => import('@/views/TemplateEditorView.vue'),
+                component: () => import('@/views/TemplateEditorView.vue')
             },
             {
                 path: 'templates/:id',
                 name: 'template-id',
-                component: () => import('@/views/TemplateEditorView.vue'),
+                component: () => import('@/views/TemplateEditorView.vue')
             },
             {
                 path: 'documents',
                 name: 'documents',
-                component: () => import('@/views/DocumentsView.vue'),
+                component: () => import('@/views/DocumentsView.vue')
             },
             {
                 path: 'documents/generate',
                 name: 'generate',
-                component: () => import('@/views/DocumentGeneratorView.vue'),
+                component: () => import('@/views/DocumentGeneratorView.vue')
             },
             {
                 path: 'audit',
                 name: 'audit',
-                component: () => import('@/views/AuditView.vue'),
+                component: () => import('@/views/AuditView.vue')
             }
         ]
     },
@@ -83,55 +83,55 @@ const routes = [
         name: 'not-found',
         redirect: '/'
     }
-]
+];
 
 const router = createRouter({
     history: createWebHistory(),
     routes
-})
+});
 
 router.beforeEach(async (to) => {
     while (auth0.isLoading.value) {
-        await new Promise(resolve => setTimeout(resolve, 50))
+        await new Promise((resolve) => setTimeout(resolve, 50));
     }
 
     if (!auth0.isAuthenticated.value) {
-        await auth0.loginWithRedirect({appState: {target: to.fullPath}})
-        return false
+        await auth0.loginWithRedirect({ appState: { target: to.fullPath } });
+        return false;
     }
 
     try {
-        const authStore = useAuthStore()
+        const authStore = useAuthStore();
 
         if (!authStore.user) {
-            await authStore.fetchMe()
+            await authStore.fetchMe();
         }
 
-        const user = authStore.user
-        if (!user) return false
+        const user = authStore.user;
+        if (!user) return false;
 
         if (!user.name || !user.surname) {
             if (to.name !== 'complete-profile') {
-                return { name: 'complete-profile' }
+                return { name: 'complete-profile' };
             }
-            return true
+            return true;
         }
 
         if (!user.registered) {
             if (to.name !== 'create-first-org') {
-                return { name: 'create-first-org' }
+                return { name: 'create-first-org' };
             }
-            return true
+            return true;
         }
 
         if (to.meta.isWizard) {
-            return { name: 'home' }
+            return { name: 'home' };
         }
 
-        return true
+        return true;
     } catch (error) {
-        return false
+        return false;
     }
-})
+});
 
-export default router
+export default router;

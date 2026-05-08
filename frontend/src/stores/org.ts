@@ -1,10 +1,10 @@
-import { defineStore } from 'pinia'
-import { api } from '@/api/client'
-import type {Organisation} from "@/types/organisation.ts";
+import { defineStore } from 'pinia';
+import { api } from '@/api/client';
+import type { Organisation } from '@/types/organisation.ts';
 
 interface OrgState {
-    organisations: Organisation[]
-    currentOrgId: number | null
+    organisations: Organisation[];
+    currentOrgId: number | null;
 }
 
 export const useOrgStore = defineStore('org', {
@@ -15,22 +15,22 @@ export const useOrgStore = defineStore('org', {
 
     getters: {
         currentOrg(state): Organisation | undefined {
-            return state.organisations.find(o => o.id === state.currentOrgId)
+            return state.organisations.find((o) => o.id === state.currentOrgId);
         }
     },
 
     actions: {
         async fetch(): Promise<void> {
-            const data = await api.organisations.my()
-            this.organisations = data
+            const data = await api.organisations.my();
+            this.organisations = data;
 
             if (!this.currentOrgId && data.length > 0) {
-                this.currentOrgId = data[0]?.id || null
+                this.currentOrgId = data[0]?.id || null;
             }
         },
 
         setCurrentOrg(id: number) {
-            this.currentOrgId = id
+            this.currentOrgId = id;
         }
     }
-})
+});

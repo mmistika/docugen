@@ -16,8 +16,8 @@ export interface Field {
 export type FieldType = 'text' | 'number';
 
 export type FieldPropertyDef =
-    | { key: string; label: string; kind: 'text';    placeholder?: string }
-    | { key: string; label: string; kind: 'number';  placeholder?: string }
+    | { key: string; label: string; kind: 'text'; placeholder?: string }
+    | { key: string; label: string; kind: 'number'; placeholder?: string }
     | { key: string; label: string; kind: 'boolean' };
 
 export interface FieldTypeDef {
@@ -37,13 +37,28 @@ export const FIELD_TYPE_REGISTRY: FieldTypeDef[] = [
         defaults: {
             maxLength: 255,
             minLength: 0,
-            placeholder: 'Enter text...',
+            placeholder: 'Enter text...'
         },
         properties: [
-            { key: 'placeholder', label: 'Placeholder', kind: 'text',   placeholder: 'Enter text...' },
-            { key: 'minLength',   label: 'Min Length',  kind: 'number', placeholder: '0' },
-            { key: 'maxLength',   label: 'Max Length',  kind: 'number', placeholder: '255' },
-        ],
+            {
+                key: 'placeholder',
+                label: 'Placeholder',
+                kind: 'text',
+                placeholder: 'Enter text...'
+            },
+            {
+                key: 'minLength',
+                label: 'Min Length',
+                kind: 'number',
+                placeholder: '0'
+            },
+            {
+                key: 'maxLength',
+                label: 'Max Length',
+                kind: 'number',
+                placeholder: '255'
+            }
+        ]
     },
     {
         type: 'number',
@@ -52,27 +67,45 @@ export const FIELD_TYPE_REGISTRY: FieldTypeDef[] = [
         defaults: {
             minValue: 0,
             maxValue: 999,
-            decimalPlaces: 0,
+            decimalPlaces: 0
         },
         properties: [
-            { key: 'minValue',      label: 'Min Value',      kind: 'number', placeholder: '0' },
-            { key: 'maxValue',      label: 'Max Value',      kind: 'number', placeholder: '999' },
-            { key: 'decimalPlaces', label: 'Decimal Places', kind: 'number', placeholder: '0' },
-        ],
-    },
+            {
+                key: 'minValue',
+                label: 'Min Value',
+                kind: 'number',
+                placeholder: '0'
+            },
+            {
+                key: 'maxValue',
+                label: 'Max Value',
+                kind: 'number',
+                placeholder: '999'
+            },
+            {
+                key: 'decimalPlaces',
+                label: 'Decimal Places',
+                kind: 'number',
+                placeholder: '0'
+            }
+        ]
+    }
 ];
 
 export const FIELD_TYPE_MAP = Object.fromEntries(
     FIELD_TYPE_REGISTRY.map((d) => [d.type, d])
 ) as Record<FieldType, FieldTypeDef>;
 
-export function createField(type: FieldType, scope: 'global' | 'inline'): Field {
+export function createField(
+    type: FieldType,
+    scope: 'global' | 'inline'
+): Field {
     const def = FIELD_TYPE_MAP[type];
     return {
         id: `${scope}_${Date.now()}`,
         name: `${scope}_${type}`,
         type,
         required: false,
-        ...def.defaults,
+        ...def.defaults
     };
 }

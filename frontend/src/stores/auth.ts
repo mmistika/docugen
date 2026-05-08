@@ -1,10 +1,10 @@
-import {defineStore} from 'pinia'
-import {api} from '@/api/client'
-import {auth0} from '@/auth'
-import type {MeResponse} from '@/types/user'
+import { defineStore } from 'pinia';
+import { api } from '@/api/client';
+import { auth0 } from '@/auth';
+import type { MeResponse } from '@/types/user';
 
 interface AuthState {
-    user: MeResponse | null
+    user: MeResponse | null;
 }
 
 export const useAuthStore = defineStore('auth', {
@@ -13,23 +13,25 @@ export const useAuthStore = defineStore('auth', {
     }),
     actions: {
         async fetchMe() {
-            this.user = await api.users.me()
+            this.user = await api.users.me();
         },
         async completeProfile(name: string, surname: string) {
-            await api.users.completeRegistration({ name, surname })
+            await api.users.completeRegistration({ name, surname });
             if (this.user) {
-                this.user.name = name
-                this.user.surname = surname
+                this.user.name = name;
+                this.user.surname = surname;
             }
         },
         async completeOrg(orgName: string) {
-            await api.organisations.create({ name: orgName })
+            await api.organisations.create({ name: orgName });
             if (this.user) {
-                this.user.registered = true
+                this.user.registered = true;
             }
         },
         async logout() {
-            await auth0.logout({ logoutParams: { returnTo: window.location.origin } })
+            await auth0.logout({
+                logoutParams: { returnTo: window.location.origin }
+            });
         }
     }
-})
+});

@@ -1,5 +1,5 @@
 export interface Organisation {
-    id: number
-    name: string
-    memberCount: number
+    id: number;
+    name: string;
+    memberCount: number;
 }
