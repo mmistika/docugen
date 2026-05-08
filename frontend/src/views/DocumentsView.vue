@@ -4,7 +4,7 @@ import {CheckCircle, Eye, FileText, Plus, RotateCcw} from '@lucide/vue'
 import {RouterLink} from 'vue-router'
 import {useOrgStore} from '@/stores/org'
 import {api} from '@/api/client'
-import type {Document, DocumentStatus} from '@/types/document'
+import type {Document} from '@/types/document'
 import TabHeader from "@/components/common/TabHeader.vue";
 import SearchFilterBar from "@/components/common/SearchFilterBar.vue";
 import DataTable from "@/components/common/DataTable.vue";
@@ -83,7 +83,7 @@ const finalise = async (doc: Document) => {
   try {
     await api.organisations.documents.finalise(orgStore.currentOrgId, doc.id)
     const found = documents.value.find((d) => d.id === doc.id)
-    if (found) found.status = 'FINAL' as DocumentStatus
+    if (found) found.status = 'FINAL'
   } finally {
     actionLoading.value[doc.id] = false
   }
@@ -101,7 +101,7 @@ const revertToDraft = async (doc: Document) => {
   }
 }
 
-const isFinal = (doc: Document) => doc.status === 'FINAL' as DocumentStatus
+const isFinal = (doc: Document) => doc.status === 'FINAL'
 
 const formatDate = (date: Date | string): string => {
   const d = new Date(date)

@@ -1,4 +1,4 @@
-export type DocumentStatus = 'DRAFT' | 'ACTIVE';
+export type DocumentStatus = 'DRAFT' | 'FINAL';
 
 export interface Document {
     id: number
