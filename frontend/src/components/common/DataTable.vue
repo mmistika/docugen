@@ -8,7 +8,6 @@ defineProps<{
         label: string;
     }>;
     isLoading?: boolean;
-    error?: string | null;
     emptyText?: string;
 }>();
 </script>
@@ -21,13 +20,6 @@ defineProps<{
         >
             <Loader2 :size="16" class="animate-spin text-gray-600" />
             Loading records…
-        </div>
-
-        <div
-            v-else-if="error"
-            class="text-sm text-red-500 text-center py-12 bg-white border border-gray-300 rounded-lg shadow-sm"
-        >
-            {{ error }}
         </div>
 
         <div

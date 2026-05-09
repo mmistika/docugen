@@ -17,7 +17,6 @@ const logs = ref<AuditLogDTO[]>([]);
 const totalPages = ref(0);
 const totalElements = ref(0);
 const isLoading = ref(false);
-const error = ref<string | null>(null);
 
 const selectedAction = ref('');
 const selectedEntityType = ref('');
@@ -51,7 +50,6 @@ const filteredLogs = computed(() =>
 const fetch = async () => {
     if (!orgStore.currentOrgId) return;
     isLoading.value = true;
-    error.value = null;
     selectedAction.value = '';
     selectedEntityType.value = '';
     try {
@@ -65,7 +63,6 @@ const fetch = async () => {
         totalPages.value = res.page.totalPages;
         totalElements.value = res.page.totalElements;
     } catch {
-        error.value = 'Failed to load audit logs.';
     } finally {
         isLoading.value = false;
     }
@@ -201,12 +198,7 @@ const BADGE = 'bg-gray-100 text-gray-700 border border-gray-200';
                 </button>
             </div>
         </div>
-        <DataTable
-            :error
-            :headers="tableHeaders"
-            :is-loading
-            :items="filteredLogs"
-        >
+        <DataTable :headers="tableHeaders" :is-loading :items="filteredLogs">
             <!-- Desktop -->
             <template #cell:timestamp="{ item }">
                 <span class="whitespace-pre-line">{{

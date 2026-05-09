@@ -11,6 +11,7 @@ import type {
     RoleUpdateRequest
 } from '@/types/rbac.ts';
 import type { AuditLogDTO } from '@/types/audit.ts';
+import { useNotificationStore } from '@/stores/notification';
 
 const apiInstance: AxiosInstance = axios.create({
     baseURL: import.meta.env.VITE_API_URL
@@ -31,6 +32,33 @@ apiInstance.interceptors.request.use(async (config) => {
 apiInstance.interceptors.response.use(
     (response) => response,
     (error) => {
+        const notificationStore = useNotificationStore();
+        let message = 'An unexpected error occurred.';
+
+        if (error.response) {
+            const status = error.response.status;
+            const data = error.response.data;
+
+            if (status === 401) {
+                message = 'Session expired. Please log in again.';
+            } else if (status === 403) {
+                message = 'You do not have permission to perform this action.';
+            } else if (status === 404) {
+                message = 'Requested resource not found.';
+            } else if (data && typeof data.message === 'string') {
+                message = data.message;
+            } else if (data && typeof data === 'string') {
+                message = data;
+            } else {
+                message = `Request failed with status code ${status}.`;
+            }
+        } else if (error.request) {
+            message = 'No response from server. Please check your connection.';
+        } else if (error.message) {
+            message = error.message;
+        }
+
+        notificationStore.error(message);
         return Promise.reject(error);
     }
 );
