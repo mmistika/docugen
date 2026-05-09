@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { useAuth0 } from '@auth0/auth0-vue';
+import ToastContainer from '@/components/common/ToastContainer.vue';
 
 const auth0 = useAuth0();
 </script>
@@ -14,5 +15,8 @@ const auth0 = useAuth0();
         />
         <span class="ml-3">Authenticating...</span>
     </div>
-    <router-view v-else />
+    <template v-else>
+        <router-view />
+        <ToastContainer />
+    </template>
 </template>
