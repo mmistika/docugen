@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { EditorContent } from '@tiptap/vue-3';
-import { ArrowLeft, FileCheck2, Save, ZoomIn, ZoomOut } from '@lucide/vue';
+import { ArrowLeft, FileCheck2, Save } from '@lucide/vue';
 import hljs from 'highlight.js/lib/core';
 import hljsJson from 'highlight.js/lib/languages/json';
 import hljsXml from 'highlight.js/lib/languages/xml';
@@ -9,6 +9,7 @@ import 'highlight.js/styles/github.css';
 import { useTemplateEditor } from '@/composables/useTemplateEditor';
 import FieldSidebar from '@/components/editor/FieldSidebar.vue';
 import FieldPropertiesPanel from '@/components/editor/FieldPropertiesPanel.vue';
+import DocumentCanvas from '@/components/common/DocumentCanvas.vue';
 
 hljs.registerLanguage('json', hljsJson);
 hljs.registerLanguage('xml', hljsXml);
@@ -48,27 +49,6 @@ const TABS: { key: Tab; label: string }[] = [
     { key: 'manifest', label: 'Manifest View' },
     { key: 'html', label: 'HTML View' }
 ];
-
-const A4_W = 794;
-const A4_H = 1123;
-const MIN_SCALE = 0.3;
-const MAX_SCALE = 2.0;
-const scale = ref(0.9);
-
-const sheetStyle = computed(() => ({
-    width: `${A4_W}px`,
-    height: `${A4_H}px`,
-    transform: `scale(${scale.value})`,
-    transformOrigin: 'top left',
-    position: 'absolute' as const
-}));
-
-const wrapperStyle = computed(() => ({
-    width: `${A4_W * scale.value}px`,
-    height: `${A4_H * scale.value}px`,
-    flexShrink: 0,
-    position: 'relative' as const
-}));
 
 const documentAreaRef = ref<HTMLElement | null>(null);
 
@@ -184,64 +164,13 @@ const highlightedHtml = computed(
                             {{ tab.label }}
                         </button>
                     </nav>
-                    <div class="flex items-center gap-2 py-2 ml-4 shrink-0">
-                        <button
-                            class="p-1 rounded hover:bg-gray-100 text-gray-500"
-                            title="Zoom out"
-                            @click="
-                                scale = Math.max(
-                                    MIN_SCALE,
-                                    Math.round((scale - 0.1) * 100) / 100
-                                )
-                            "
-                        >
-                            <ZoomOut :size="15" />
-                        </button>
-
-                        <input
-                            v-model.number="scale"
-                            :max="MAX_SCALE"
-                            :min="MIN_SCALE"
-                            :step="0.05"
-                            class="w-24 accent-gray-800"
-                            type="range"
-                        />
-
-                        <button
-                            class="p-1 rounded hover:bg-gray-100 text-gray-500"
-                            title="Zoom in"
-                            @click="
-                                scale = Math.min(
-                                    MAX_SCALE,
-                                    Math.round((scale + 0.1) * 100) / 100
-                                )
-                            "
-                        >
-                            <ZoomIn :size="15" />
-                        </button>
-
-                        <span
-                            class="text-xs text-gray-500 w-10 text-right tabular-nums"
-                        >
-                            {{ Math.round(scale * 100) }}%
-                        </span>
-                    </div>
                 </div>
-                <div ref="documentAreaRef" class="flex-1 overflow-auto">
-                    <div
-                        v-show="activeTab === 'document'"
-                        :style="{ minHeight: `${A4_H * scale + 64}px` }"
-                        class="flex justify-center py-8 px-4"
-                    >
-                        <div :style="wrapperStyle">
-                            <div
-                                :style="sheetStyle"
-                                class="bg-white border border-gray-300 shadow-sm p-[20mm]"
-                            >
-                                <EditorContent :editor="editor" />
-                            </div>
+                <div ref="documentAreaRef" class="flex-1 overflow-hidden">
+                    <DocumentCanvas v-show="activeTab === 'document'">
+                        <div class="h-full w-full p-[20mm]">
+                            <EditorContent :editor="editor" />
                         </div>
-                    </div>
+                    </DocumentCanvas>
                     <div v-if="activeTab === 'manifest'" class="p-4 lg:p-8">
                         <div
                             class="max-w-4xl mx-auto bg-white border border-gray-300 rounded-lg shadow-sm overflow-hidden"

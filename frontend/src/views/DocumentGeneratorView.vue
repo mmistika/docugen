@@ -1,13 +1,14 @@
 <script lang="ts" setup>
 import { computed, nextTick, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { Eye, FileText, Loader2, Wand2, ZoomIn, ZoomOut } from '@lucide/vue';
+import { Eye, FileText, Loader2, Wand2 } from '@lucide/vue';
 import { api } from '@/api/client';
 import { useOrgStore } from '@/stores/org';
 import { buildInteractiveContent } from '@/utils/templateParser';
 import type { Template, TemplateDetail } from '@/types/template';
 import type { Field } from '@/types/field';
 import TabHeader from '@/components/common/TabHeader.vue';
+import DocumentCanvas from '@/components/common/DocumentCanvas.vue';
 
 const router = useRouter();
 const orgStore = useOrgStore();
@@ -125,27 +126,6 @@ const canGenerate = computed(() => !!selectedId.value && !isGenerating.value);
 
 const fieldError = (key: string) =>
     submitAttempted.value ? (validationErrors.value[key] ?? null) : null;
-
-const A4_W = 794;
-const A4_H = 1123;
-const MIN_SCALE = 0.3;
-const MAX_SCALE = 2.0;
-const scale = ref(0.85);
-
-const sheetStyle = computed(() => ({
-    width: `${A4_W}px`,
-    height: `${A4_H}px`,
-    transform: `scale(${scale.value})`,
-    transformOrigin: 'top left',
-    position: 'absolute' as const
-}));
-
-const wrapperStyle = computed(() => ({
-    width: `${A4_W * scale.value}px`,
-    height: `${A4_H * scale.value}px`,
-    flexShrink: 0,
-    position: 'relative' as const
-}));
 
 const previewAreaRef = ref<HTMLElement | null>(null);
 
@@ -369,43 +349,6 @@ watch(
                             Fill Document Details
                         </h2>
                     </div>
-                    <div v-if="detail" class="flex items-center gap-2 shrink-0">
-                        <button
-                            class="p-1 rounded hover:bg-gray-100 text-gray-500"
-                            @click="
-                                scale = Math.max(
-                                    MIN_SCALE,
-                                    Math.round((scale - 0.1) * 100) / 100
-                                )
-                            "
-                        >
-                            <ZoomOut :size="14" />
-                        </button>
-                        <input
-                            v-model.number="scale"
-                            :max="MAX_SCALE"
-                            :min="MIN_SCALE"
-                            :step="0.05"
-                            class="w-24 accent-gray-800"
-                            type="range"
-                        />
-                        <button
-                            class="p-1 rounded hover:bg-gray-100 text-gray-500"
-                            @click="
-                                scale = Math.min(
-                                    MAX_SCALE,
-                                    Math.round((scale + 0.1) * 100) / 100
-                                )
-                            "
-                        >
-                            <ZoomIn :size="14" />
-                        </button>
-                        <span
-                            class="text-xs text-gray-400 w-9 text-right tabular-nums"
-                        >
-                            {{ Math.round(scale * 100) }}%
-                        </span>
-                    </div>
                 </div>
                 <div
                     v-if="submitAttempted && hasErrors"
@@ -421,23 +364,17 @@ watch(
                 <div
                     v-if="detail"
                     ref="previewAreaRef"
-                    class="bg-gray-100 border border-gray-200 rounded-lg overflow-auto"
-                    style="max-height: 70vh"
+                    class="border border-gray-200 rounded-lg overflow-hidden"
+                    style="height: 70vh; min-height: 400px"
                 >
-                    <div
-                        :style="{ minHeight: `${A4_H * scale + 64}px` }"
-                        class="flex justify-center py-8 px-4"
-                    >
-                        <div :style="wrapperStyle">
-                            <div
-                                :style="sheetStyle"
-                                class="bg-white border border-gray-300 shadow-sm prose max-w-none"
-                                style="padding: 28mm 20mm"
-                                @input="onPreviewInput"
-                                v-html="renderedContent"
-                            />
-                        </div>
-                    </div>
+                    <DocumentCanvas>
+                        <div
+                            class="h-full w-full prose max-w-none"
+                            style="padding: 28mm 20mm"
+                            @input="onPreviewInput"
+                            v-html="renderedContent"
+                        />
+                    </DocumentCanvas>
                 </div>
                 <div v-else class="text-sm text-gray-400 text-center py-8">
                     Complete previous steps to preview document
