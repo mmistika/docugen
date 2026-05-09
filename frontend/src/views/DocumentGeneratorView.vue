@@ -9,6 +9,7 @@ import type { Template, TemplateDetail } from '@/types/template';
 import type { Field } from '@/types/field';
 import TabHeader from '@/components/common/TabHeader.vue';
 import DocumentCanvas from '@/components/common/DocumentCanvas.vue';
+import { useDocumentValidator } from '@/composables/useDocumentValidator';
 
 const router = useRouter();
 const orgStore = useOrgStore();
@@ -22,6 +23,13 @@ const submitAttempted = ref(false);
 
 const documentName = ref('');
 const fieldValues = ref<Record<string, string>>({});
+
+const { globalFields, validationErrors, hasErrors, errorCount } =
+    useDocumentValidator(
+        documentName,
+        fieldValues,
+        computed(() => detail.value?.manifest)
+    );
 
 watch(
     () => orgStore.currentOrgId,
@@ -56,72 +64,6 @@ const selectTemplate = async (template: Template) => {
 
 const isDraft = computed(() => detail.value?.status === 'DRAFT');
 
-const globalFields = computed<Field[]>(() => {
-    if (!detail.value?.manifest) return [];
-    try {
-        return JSON.parse(detail.value.manifest).fields ?? [];
-    } catch {
-        return [];
-    }
-});
-
-const validationErrors = computed<Record<string, string>>(() => {
-    const errors: Record<string, string> = {};
-
-    if (!documentName.value.trim()) {
-        errors['documentName'] = 'Document name is required.';
-    }
-
-    for (const field of globalFields.value) {
-        const raw = fieldValues.value[field.name] ?? '';
-        const value = raw.trim();
-
-        if (field.required && !value) {
-            errors[field.name] = 'This field is required.';
-            continue;
-        }
-        if (!value) continue;
-
-        if (field.type === 'text') {
-            if (field.minLength != null && value.length < field.minLength)
-                errors[field.name] = `Minimum ${field.minLength} characters.`;
-            else if (field.maxLength != null && value.length > field.maxLength)
-                errors[field.name] = `Maximum ${field.maxLength} characters.`;
-        }
-
-        if (field.type === 'number') {
-            const num = Number(value);
-            if (isNaN(num)) {
-                errors[field.name] = 'Must be a number.';
-            } else {
-                if (field.minValue != null && num < field.minValue)
-                    errors[field.name] = `Minimum value is ${field.minValue}.`;
-                else if (field.maxValue != null && num > field.maxValue)
-                    errors[field.name] = `Maximum value is ${field.maxValue}.`;
-            }
-        }
-    }
-
-    try {
-        const inlineFields: Field[] =
-            JSON.parse(detail.value?.manifest ?? '{}').inline_fields ?? [];
-        for (const field of inlineFields) {
-            if (
-                field.required &&
-                !(fieldValues.value[field.name] ?? '').trim()
-            ) {
-                errors[`inline_${field.name}`] =
-                    `Inline field "${field.name}" is required.`;
-            }
-        }
-    } catch {}
-    return errors;
-});
-
-const hasErrors = computed(
-    () => Object.keys(validationErrors.value).length > 0
-);
-const errorCount = computed(() => Object.keys(validationErrors.value).length);
 const canGenerate = computed(() => !!selectedId.value && !isGenerating.value);
 
 const fieldError = (key: string) =>
@@ -179,10 +121,15 @@ watch(
             .querySelectorAll<HTMLInputElement>('[data-field-name]')
             .forEach((input) => {
                 const name = input.getAttribute('data-field-name')!;
-                const hasError =
-                    submitAttempted.value &&
-                    !!validationErrors.value[`inline_${name}`];
-                input.classList.toggle('inline-doc-input--error', hasError);
+                const error = submitAttempted.value
+                    ? (validationErrors.value[`inline_${name}`] ?? null)
+                    : null;
+                input.classList.toggle('inline-doc-input--error', !!error);
+                if (error) {
+                    input.setAttribute('title', error);
+                } else {
+                    input.removeAttribute('title');
+                }
             });
     },
     { deep: true }
