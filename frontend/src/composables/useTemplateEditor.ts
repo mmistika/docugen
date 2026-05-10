@@ -137,7 +137,12 @@ export function useTemplateEditor() {
 
                 editor.value?.commands.setContent(data.content);
                 setTimeout(() => (hasChanges.value = false), 100);
-            } catch {}
+            } catch (error) {
+                console.error(
+                    'Failed to load template details for editor:',
+                    error
+                );
+            }
         } else if (isNew.value && editor.value) {
             editor.value.commands.setContent(`<p>New Template.</p>`);
             setTimeout(() => (hasChanges.value = false), 100);
@@ -189,7 +194,9 @@ export function useTemplateEditor() {
                 hasChanges.value = false;
                 status.value = 'DRAFT';
             }
-        } catch {}
+        } catch (error) {
+            console.error('Failed to save template draft:', error);
+        }
     };
 
     const handlePublish = async () => {
@@ -202,7 +209,9 @@ export function useTemplateEditor() {
             );
             status.value = 'ACTIVE';
             hasChanges.value = false;
-        } catch {}
+        } catch (error) {
+            console.error('Failed to publish template:', error);
+        }
     };
 
     const addGlobalField = (type: FieldType) => {

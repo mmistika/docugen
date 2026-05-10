@@ -43,6 +43,7 @@ const createOrganisation = async (name: string) => {
         await orgStore.fetch();
         handleClose();
     } catch (error) {
+        console.error('Failed to create organisation:', error);
     } finally {
         isSubmitting.value = false;
     }

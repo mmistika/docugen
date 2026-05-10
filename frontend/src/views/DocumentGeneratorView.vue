@@ -37,7 +37,9 @@ watch(
         if (newId) {
             try {
                 templates.value = await api.organisations.templates.all(newId);
-            } catch (error) {}
+            } catch (error) {
+                console.error('Failed to fetch templates:', error);
+            }
         }
     },
     { immediate: true }

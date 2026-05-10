@@ -59,14 +59,20 @@ onMounted(async () => {
         const orgs = await api.organisations.my();
         const org = orgs.find((o) => o.id === orgId.value);
         if (org) orgName.value = org.name;
-    } catch {}
+    } catch (error) {
+        console.error('Failed to fetch user organisations in settings:', error);
+    }
 
     try {
         roles.value = await api.organisations.rbac.roles(orgId.value);
         allPermissions.value = await api.organisations.rbac.permissions(
             orgId.value
         );
-    } catch {
+    } catch (error) {
+        console.error(
+            'Failed to fetch roles & permissions in settings:',
+            error
+        );
     } finally {
         isLoading.value = false;
     }

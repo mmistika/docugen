@@ -23,6 +23,7 @@ watch(
                     orgStore.currentOrgId!
                 );
             } catch (error) {
+                console.error('Failed to fetch templates list:', error);
             } finally {
                 isLoading.value = false;
             }

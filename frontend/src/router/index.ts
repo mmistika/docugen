@@ -130,6 +130,7 @@ router.beforeEach(async (to) => {
 
         return true;
     } catch (error) {
+        console.error('Navigation guard failed:', error);
         return false;
     }
 });
