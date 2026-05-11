@@ -27,6 +27,8 @@ const tableHeaders = [
 const showInvite = ref(false);
 const showManageRoles = ref(false);
 const manageTarget = ref<Member | null>(null);
+const isInviting = ref(false);
+const isSavingRoles = ref(false);
 
 watch(
     () => orgStore.currentOrgId,
@@ -67,13 +69,22 @@ const filteredMembers = computed(() => {
 });
 
 const handleInvite = async (email: string, role: string) => {
-    await api.users.invite({
-        orgId: orgStore.currentOrgId!,
-        email,
-        role
-    });
-    members.value = await api.organisations.members.all(orgStore.currentOrgId!);
-    showInvite.value = false;
+    isInviting.value = true;
+    try {
+        await api.users.invite({
+            orgId: orgStore.currentOrgId!,
+            email,
+            role
+        });
+        members.value = await api.organisations.members.all(
+            orgStore.currentOrgId!
+        );
+        showInvite.value = false;
+    } catch (error) {
+        console.error('Failed to invite member:', error);
+    } finally {
+        isInviting.value = false;
+    }
 };
 
 const openManageRoles = (member: Member) => {
@@ -82,15 +93,22 @@ const openManageRoles = (member: Member) => {
 };
 
 const handleSaveRoles = async (memberId: number, roles: string[]) => {
-    await api.organisations.members.updateRoles(
-        orgStore.currentOrgId!,
-        memberId,
-        roles
-    );
-    const found = members.value.find((m) => m.id === memberId);
-    if (found) found.roles = roles;
-    showManageRoles.value = false;
-    manageTarget.value = null;
+    isSavingRoles.value = true;
+    try {
+        await api.organisations.members.updateRoles(
+            orgStore.currentOrgId!,
+            memberId,
+            roles
+        );
+        const found = members.value.find((m) => m.id === memberId);
+        if (found) found.roles = roles;
+        showManageRoles.value = false;
+        manageTarget.value = null;
+    } catch (error) {
+        console.error('Failed to update member roles:', error);
+    } finally {
+        isSavingRoles.value = false;
+    }
 };
 </script>
 
@@ -210,6 +228,7 @@ const handleSaveRoles = async (memberId: number, roles: string[]) => {
 
         <InviteMemberModal
             :available-roles="orgRoles"
+            :is-saving="isInviting"
             :show="showInvite"
             @close="showInvite = false"
             @invite="handleInvite"
@@ -217,6 +236,7 @@ const handleSaveRoles = async (memberId: number, roles: string[]) => {
 
         <ManageMemberRolesModal
             :available-roles="orgRoles"
+            :is-saving="isSavingRoles"
             :member="manageTarget"
             :show="showManageRoles"
             @close="

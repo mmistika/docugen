@@ -5,6 +5,7 @@ import Modal from '@/components/modals/Modal.vue';
 const props = defineProps<{
     show: boolean;
     availableRoles: string[];
+    isSaving?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -14,7 +15,6 @@ const emit = defineEmits<{
 
 const email = ref('');
 const role = ref('');
-const isSaving = ref(false);
 const emailError = ref<string | null>(null);
 const roleError = ref<string | null>(null);
 
@@ -29,7 +29,7 @@ watch(
     }
 );
 
-const submit = async () => {
+const submit = () => {
     emailError.value = null;
     roleError.value = null;
 
@@ -47,12 +47,7 @@ const submit = async () => {
         return;
     }
 
-    isSaving.value = true;
-    try {
-        emit('invite', emailTrimmed, role.value);
-    } finally {
-        isSaving.value = false;
-    }
+    emit('invite', emailTrimmed, role.value);
 };
 </script>
 
@@ -110,7 +105,8 @@ const submit = async () => {
         </template>
         <template #footer>
             <button
-                class="px-4 py-2 border border-gray-300 rounded text-sm hover:bg-gray-50 transition-colors"
+                :disabled="isSaving"
+                class="px-4 py-2 border border-gray-300 rounded text-sm hover:bg-gray-50 transition-colors disabled:opacity-50"
                 @click="emit('close')"
             >
                 Cancel

@@ -100,6 +100,7 @@ const permissionGroups = computed(() => {
 
 const showModal = ref(false);
 const editTarget = ref<RoleDTO | null>(null);
+const isSavingRole = ref(false);
 
 const openCreate = () => {
     editTarget.value = null;
@@ -117,23 +118,30 @@ const closeModal = () => {
 };
 
 const saveRole = async (name: string, permissions: string[]) => {
-    if (editTarget.value) {
-        await api.organisations.rbac.updateRole(orgId.value, {
-            name,
-            permissions
-        });
-        const found = roles.value.find(
-            (r) => r.name === editTarget.value!.name
-        );
-        if (found) found.permissions = permissions;
-    } else {
-        await api.organisations.rbac.createRole(orgId.value, {
-            name,
-            permissions
-        });
-        roles.value = await api.organisations.rbac.roles(orgId.value);
+    isSavingRole.value = true;
+    try {
+        if (editTarget.value) {
+            await api.organisations.rbac.updateRole(orgId.value, {
+                name,
+                permissions
+            });
+            const found = roles.value.find(
+                (r) => r.name === editTarget.value!.name
+            );
+            if (found) found.permissions = permissions;
+        } else {
+            await api.organisations.rbac.createRole(orgId.value, {
+                name,
+                permissions
+            });
+            roles.value = await api.organisations.rbac.roles(orgId.value);
+        }
+        closeModal();
+    } catch (error) {
+        console.error('Failed to save role:', error);
+    } finally {
+        isSavingRole.value = false;
     }
-    closeModal();
 };
 
 const deleteRole = async (role: RoleDTO) => {
@@ -370,6 +378,7 @@ const deleteRole = async (role: RoleDTO) => {
         </div>
         <RoleModal
             :all-permissions="allPermissions"
+            :is-saving="isSavingRole"
             :role="editTarget"
             :show="showModal"
             @close="closeModal"

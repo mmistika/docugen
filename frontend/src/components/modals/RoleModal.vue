@@ -8,6 +8,7 @@ const props = defineProps<{
     // null for create, RoleDTO for edit
     role: RoleDTO | null;
     allPermissions: PermissionDTO[];
+    isSaving?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -17,7 +18,6 @@ const emit = defineEmits<{
 
 const name = ref('');
 const selectedPerms = ref<Set<string>>(new Set());
-const isSaving = ref(false);
 const nameError = ref<string | null>(null);
 
 watch(
@@ -77,7 +77,7 @@ const groupSomeSelected = (perms: PermissionDTO[]) =>
 
 const isEditMode = computed(() => props.role !== null);
 
-const submit = async () => {
+const submit = () => {
     nameError.value = null;
     if (!name.value.trim()) {
         nameError.value = 'Role name is required.';
@@ -87,12 +87,7 @@ const submit = async () => {
         nameError.value = 'Select at least one permission.';
         return;
     }
-    isSaving.value = true;
-    try {
-        emit('save', name.value.trim(), [...selectedPerms.value]);
-    } finally {
-        isSaving.value = false;
-    }
+    emit('save', name.value.trim(), [...selectedPerms.value]);
 };
 </script>
 
@@ -234,7 +229,8 @@ const submit = async () => {
         </template>
         <template #footer>
             <button
-                class="px-4 py-2 border border-gray-300 rounded text-sm hover:bg-gray-50 transition-colors"
+                :disabled="isSaving"
+                class="px-4 py-2 border border-gray-300 rounded text-sm hover:bg-gray-50 transition-colors disabled:opacity-50"
                 @click="emit('close')"
             >
                 Cancel

@@ -7,6 +7,7 @@ const props = defineProps<{
     show: boolean;
     member: Member | null;
     availableRoles: string[];
+    isSaving?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -109,13 +110,15 @@ const submit = () => {
         </template>
         <template #footer>
             <button
-                class="px-4 py-2 border border-gray-300 rounded text-sm hover:bg-gray-50 transition-colors"
+                :disabled="isSaving"
+                class="px-4 py-2 border border-gray-300 rounded text-sm hover:bg-gray-50 transition-colors disabled:opacity-50"
                 @click="emit('close')"
             >
                 Cancel
             </button>
             <button
-                class="px-4 py-2 bg-gray-900 text-white rounded text-sm hover:bg-gray-800 transition-colors"
+                :disabled="isSaving"
+                class="px-4 py-2 bg-gray-900 text-white rounded text-sm hover:bg-gray-800 transition-colors disabled:opacity-50"
                 @click="submit"
             >
                 Save Roles
