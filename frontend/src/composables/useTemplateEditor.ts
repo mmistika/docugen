@@ -3,47 +3,29 @@ import { useRoute, useRouter } from 'vue-router';
 import { useEditor } from '@tiptap/vue-3';
 import StarterKit from '@tiptap/starter-kit';
 import type { Editor } from '@tiptap/core';
-import { mergeAttributes, Node } from '@tiptap/core';
 import { api } from '@/api/client';
 import { useOrgStore } from '@/stores/org';
 import type { Field, FieldType } from '@/types/field';
 import { createField } from '@/types/field';
 import type { TemplateVersionStatus } from '@/types/template';
+import { InlineFieldNode } from '@/editor/extensions/InlineFieldNode';
 
-export const InlineFieldNode = Node.create({
-    name: 'inlineField',
-    group: 'inline',
-    inline: true,
-    selectable: true,
-    atom: true,
+const areFieldsEqual = (a: Field[], b: Field[]): boolean => {
+    if (a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i++) {
+        const fA = a[i]!;
+        const fB = b[i]!;
 
-    addAttributes() {
-        return {
-            id: { default: null },
-            name: { default: 'new_field' },
-            type: { default: 'text' },
-            required: { default: false }
-        };
-    },
+        const keysA = Object.keys(fA) as (keyof Field)[];
+        const keysB = Object.keys(fB) as (keyof Field)[];
+        if (keysA.length !== keysB.length) return false;
 
-    parseHTML() {
-        return [{ tag: 'span[data-type="inline-field"]' }];
-    },
-
-    renderHTML({ HTMLAttributes }) {
-        return [
-            'span',
-            mergeAttributes(HTMLAttributes, {
-                'data-type': 'inline-field',
-                class:
-                    'inline-flex items-center px-1.5 py-0.5 rounded text-xs font-mono font-medium ' +
-                    'bg-blue-100 text-blue-800 border border-blue-200 cursor-pointer mx-1 select-all ' +
-                    'transition-colors hover:bg-blue-200'
-            }),
-            `{${HTMLAttributes.name}}`
-        ];
+        for (const key of keysA) {
+            if (fA[key] !== fB[key]) return false;
+        }
     }
-});
+    return true;
+};
 
 export function useTemplateEditor() {
     const route = useRoute();
@@ -78,9 +60,6 @@ export function useTemplateEditor() {
             hasChanges.value = true;
             syncInlineFields(editor);
         },
-        onTransaction: ({ editor }) => {
-            syncInlineFields(editor);
-        },
         onSelectionUpdate: ({ editor }) => {
             if (editor.isActive('inlineField')) {
                 selectedFieldId.value = editor.getAttributes('inlineField').id;
@@ -108,10 +87,7 @@ export function useTemplateEditor() {
             return { ...newConfig, ...nodeAttrs } as Field;
         });
 
-        if (
-            JSON.stringify(updatedInlineFields) !==
-            JSON.stringify(inlineFields.value)
-        ) {
+        if (!areFieldsEqual(updatedInlineFields, inlineFields.value)) {
             inlineFields.value = updatedInlineFields;
             hasChanges.value = true;
         }
@@ -235,12 +211,15 @@ export function useTemplateEditor() {
         selectedFieldId.value = field.id;
     };
 
-    const activeField = computed(
-        () =>
-            globalFields.value.find((f) => f.id === selectedFieldId.value) ||
-            inlineFields.value.find((f) => f.id === selectedFieldId.value) ||
+    const activeField = computed(() => {
+        const id = selectedFieldId.value;
+        if (!id) return null;
+        return (
+            globalFields.value.find((f) => f.id === id) ||
+            inlineFields.value.find((f) => f.id === id) ||
             null
-    );
+        );
+    });
 
     const isInlineFieldActive = computed(() =>
         inlineFields.value.some((f) => f.id === selectedFieldId.value)
