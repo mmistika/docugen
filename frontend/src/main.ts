@@ -1,11 +1,11 @@
-import "./assets/main.css";
+import './assets/main.css';
 
-import { createApp } from "vue";
-import { createPinia } from "pinia";
+import { createApp } from 'vue';
+import { createPinia } from 'pinia';
 
-import App from "./App.vue";
-import router from "./router";
-import { auth0 } from "@/auth";
+import App from './App.vue';
+import router from './router';
+import { auth0 } from '@/auth';
 
 const app = createApp(App);
 
