@@ -54,8 +54,8 @@ export function useDocumentValidator(
         }
 
         for (const field of globalFields.value) {
-            const raw = fieldValues.value[field.name] ?? '';
-            const value = raw.trim();
+            const raw = fieldValues.value[field.name];
+            const value = raw != null ? String(raw).trim() : '';
             const err = validateField(field, value);
             if (err) {
                 errors[field.name] = err;
@@ -66,8 +66,8 @@ export function useDocumentValidator(
             const inlineFields: Field[] =
                 JSON.parse(manifestStr.value ?? '{}').inline_fields ?? [];
             for (const field of inlineFields) {
-                const raw = fieldValues.value[field.name] ?? '';
-                const value = raw.trim();
+                const raw = fieldValues.value[field.name];
+                const value = raw != null ? String(raw).trim() : '';
                 const err = validateField(field, value);
                 if (err) {
                     errors[`inline_${field.name}`] = err;
