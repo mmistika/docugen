@@ -12,6 +12,7 @@ import com.artembilous.docugen.repository.RoleRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
@@ -51,6 +52,7 @@ public class RbacService {
 
     @Transactional
     @PreAuthorize("hasPermission(#orgId, 'organisation:manage')")
+    @CacheEvict(value = "user_permissions", allEntries = true)
     public void createRole(User user, Long orgId, RoleUpdateRequest req) {
         if ("ADMIN".equals(req.name())) {
             throw new IllegalArgumentException("Cannot create ADMIN role");
@@ -79,6 +81,7 @@ public class RbacService {
 
     @Transactional
     @PreAuthorize("hasPermission(#orgId, 'organisation:manage')")
+    @CacheEvict(value = "user_permissions", allEntries = true)
     public void updateRole(User user, Long orgId, RoleUpdateRequest req) {
         if ("ADMIN".equals(req.name())) {
             throw new IllegalStateException("Cannot modify ADMIN role");
@@ -100,6 +103,7 @@ public class RbacService {
 
     @Transactional
     @PreAuthorize("hasPermission(#orgId, 'organisation:manage')")
+    @CacheEvict(value = "user_permissions", allEntries = true)
     public void deleteRole(User user, Long orgId, String roleName) {
         if ("ADMIN".equals(roleName)) {
             throw new IllegalStateException("Cannot delete ADMIN role");
@@ -137,6 +141,7 @@ public class RbacService {
 
     @Transactional
     @PreAuthorize("hasPermission(#orgId, 'members:manage')")
+    @CacheEvict(value = "user_permissions", allEntries = true)
     public void updateMemberRoles(User user, Long orgId, Long memberId, UpdateMemberRolesRequest req) {
         Membership membership = membershipRepository
                 .findByMembershipIdAndOrganisationOrganisationId(memberId, orgId)

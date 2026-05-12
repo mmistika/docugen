@@ -9,14 +9,15 @@ import com.artembilous.docugen.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +28,9 @@ public class UserService {
     private final OrganisationRepository organisationRepository;
     private final RoleRepository roleRepository;
     private final AuditService auditService;
+    private final CacheManager cacheManager;
 
+    @Cacheable(value = "users", key = "#jwt.subject")
     @Transactional
     public User getOrCreate(Jwt jwt) {
 
@@ -52,12 +55,17 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    @Cacheable(value = "registration_status", key = "#user.userId")
     public boolean isFullyRegistered(User user) {
         return user.getName() != null &&
                 user.getSurname() != null &&
                 membershipRepository.existsByUser(user);
     }
 
+    @Caching(evict = {
+            @CacheEvict(value = "users", key = "#user.auth0Id"),
+            @CacheEvict(value = "registration_status", key = "#user.userId")
+    })
     public void completeRegistration(User user, String name, String surname) {
         user.setName(name);
         user.setSurname(surname);
@@ -67,6 +75,9 @@ public class UserService {
     @Transactional
     @PreAuthorize("hasPermission(#req.orgId(), 'members:manage')")
     public void invite(User inviter, InviteUserRequest req) {
+        if (inviter.getEmail().equalsIgnoreCase(req.email().trim())) {
+            throw new IllegalArgumentException("You cannot invite yourself to the organisation");
+        }
         User user = userRepository.findByEmail(req.email())
                 .orElseGet(() -> {
                     User u = new User();
@@ -97,5 +108,9 @@ public class UserService {
         metadata.put("userEmail", req.email());
         metadata.put("role", req.role());
         auditService.log(req.orgId(), inviter, AuditEntityType.USER, user.getUserId(), AuditAction.USER_INVITED, metadata);
+
+        if (cacheManager != null && cacheManager.getCache("registration_status") != null) {
+            Objects.requireNonNull(cacheManager.getCache("registration_status")).evict(user.getUserId());
+        }
     }
 }

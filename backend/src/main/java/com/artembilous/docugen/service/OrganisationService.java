@@ -10,6 +10,7 @@ import com.artembilous.docugen.repository.RoleRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +33,8 @@ public class OrganisationService {
     }
 
     @Transactional
-    public Organisation createOrganisation(User user, String name) {
+    @CacheEvict(value = "registration_status", key = "#user.userId")
+    public void createOrganisation(User user, String name) {
         Organisation org = new Organisation();
         org.setName(name);
         org = orgRepo.save(org);
@@ -50,8 +52,6 @@ public class OrganisationService {
         metadata.put("orgId", org.getOrganisationId());
         metadata.put("orgName", org.getName());
         auditService.log(org.getOrganisationId(), user, AuditEntityType.ORGANISATION, org.getOrganisationId(), AuditAction.ORGANISATION_CREATED, metadata);
-
-        return org;
     }
 
     @Transactional

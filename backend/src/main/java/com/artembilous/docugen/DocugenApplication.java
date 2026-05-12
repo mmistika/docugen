@@ -10,6 +10,7 @@ import static org.springframework.data.web.config.EnableSpringDataWebSupport.Pag
 
 @SpringBootApplication
 @EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO)
+@EnableCaching
 @EnableAsync
 public class DocugenApplication {
 

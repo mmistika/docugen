@@ -4,6 +4,7 @@ import com.artembilous.docugen.dto.OrganisationDTO;
 import com.artembilous.docugen.entity.Membership;
 import com.artembilous.docugen.entity.Organisation;
 import com.artembilous.docugen.entity.User;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -37,6 +38,7 @@ public interface MembershipRepository extends JpaRepository<Membership, Long> {
           AND m.organisation.organisationId = :orgId
           AND p.name = :permission
     """)
+    @Cacheable(value = "user_permissions", key = "{#userId, #orgId, #permission}")
     boolean existsPermission(Long userId, Long orgId, String permission);
 
     @Query("""
