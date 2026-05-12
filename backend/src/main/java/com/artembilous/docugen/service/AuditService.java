@@ -11,6 +11,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import tools.jackson.core.JacksonException;
@@ -27,7 +28,8 @@ public class AuditService {
 
     private final ObjectMapper objectMapper;
 
-    @Transactional
+    @Async
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
     public void log(
             Long orgId,
             User actor,
