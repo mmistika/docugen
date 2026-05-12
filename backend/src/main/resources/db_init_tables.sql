@@ -136,3 +136,8 @@ EXECUTE FUNCTION initialize_organisation_admin();
 
 -- Indexes
 CREATE INDEX idx_audit_org_timestamp ON audit_logs (organisation_id, timestamp DESC);
+CREATE INDEX idx_memberships_user_org ON memberships (user_id, organisation_id);
+CREATE INDEX idx_memberships_org ON memberships (organisation_id);
+CREATE INDEX idx_roles_org ON roles (organisation_id);
+CREATE INDEX idx_templates_org ON templates (organisation_id);
+CREATE INDEX idx_template_versions_latest ON template_versions (template_id, status);
