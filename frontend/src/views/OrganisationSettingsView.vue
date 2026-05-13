@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { computed, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { Lock, Pencil, Plus, Save, Shield, Trash2 } from '@lucide/vue';
 import { api } from '@/api/client';
 import RoleModal from '@/components/modals/RoleModal.vue';
@@ -9,6 +9,8 @@ import { useOrgStore } from '@/stores/org.ts';
 import TabHeader from '@/components/common/TabHeader.vue';
 
 const route = useRoute();
+const router = useRouter();
+const orgStore = useOrgStore();
 const orgId = computed(() => Number(route.params.id));
 
 type Tab = 'general' | 'rbac' | 'api';
@@ -39,7 +41,7 @@ const saveOrgName = async () => {
         await api.organisations.rename(orgId.value, {
             name: orgName.value.trim()
         });
-        await useOrgStore().fetch();
+        await orgStore.fetch();
         orgNameSuccess.value = true;
         setTimeout(() => (orgNameSuccess.value = false), 3000);
     } catch {
@@ -54,7 +56,8 @@ const allPermissions = ref<PermissionDTO[]>([]);
 const isLoading = ref(true);
 const error = ref<string | null>(null);
 
-onMounted(async () => {
+const fetchSettings = async () => {
+    isLoading.value = true;
     try {
         const orgs = await api.organisations.my();
         const org = orgs.find((o) => o.id === orgId.value);
@@ -76,7 +79,33 @@ onMounted(async () => {
     } finally {
         isLoading.value = false;
     }
-});
+};
+
+watch(
+    orgId,
+    (newOrgId) => {
+        if (newOrgId) {
+            fetchSettings();
+            if (orgStore.currentOrgId !== newOrgId) {
+                orgStore.setCurrentOrg(newOrgId);
+            }
+        }
+    },
+    { immediate: true }
+);
+
+watch(
+    () => orgStore.currentOrgId,
+    (newOrgId) => {
+        if (
+            newOrgId &&
+            newOrgId !== orgId.value &&
+            route.name === 'org-settings'
+        ) {
+            router.push(`/organisations/${newOrgId}/settings`);
+        }
+    }
+);
 
 const isAdmin = (role: RoleDTO) => role.name === 'ADMIN';
 

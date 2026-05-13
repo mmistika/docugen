@@ -9,6 +9,7 @@ import {
     LayoutDashboard,
     Menu,
     ScrollText,
+    Settings,
     Users,
     X
 } from '@lucide/vue';
@@ -107,31 +108,42 @@ const isActive = (path: string) => {
                         </RouterLink>
                     </div>
                     <div class="border-t border-gray-300 pt-4 mb-4">
-                        <div class="relative mb-3">
-                            <select
-                                :value="orgStore.currentOrgId"
-                                class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-white appearance-none cursor-pointer"
-                                @change="
-                                    orgStore.setCurrentOrg(
-                                        Number(
-                                            ($event.target as HTMLInputElement)
-                                                .value
+                        <div class="flex items-center gap-2">
+                            <div class="relative flex-1">
+                                <select
+                                    :value="orgStore.currentOrgId"
+                                    class="w-full pr-8 pl-3 py-2 border border-gray-300 rounded text-sm bg-white appearance-none cursor-pointer"
+                                    @change="
+                                        orgStore.setCurrentOrg(
+                                            Number(
+                                                (
+                                                    $event.target as HTMLInputElement
+                                                ).value
+                                            )
                                         )
-                                    )
-                                "
-                            >
-                                <option
-                                    v-for="org in orgStore.organisations"
-                                    :key="org.id"
-                                    :value="org.id"
+                                    "
                                 >
-                                    {{ org.name }}
-                                </option>
-                            </select>
-                            <ChevronDown
-                                :size="16"
-                                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"
-                            />
+                                    <option
+                                        v-for="org in orgStore.organisations"
+                                        :key="org.id"
+                                        :value="org.id"
+                                    >
+                                        {{ org.name }}
+                                    </option>
+                                </select>
+                                <ChevronDown
+                                    :size="16"
+                                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"
+                                />
+                            </div>
+                            <RouterLink
+                                v-if="orgStore.currentOrgId"
+                                :to="`/organisations/${orgStore.currentOrgId}/settings`"
+                                class="p-2 border border-gray-300 rounded hover:bg-gray-100 text-gray-500 hover:text-gray-900 transition-colors flex items-center justify-center shrink-0"
+                                title="Organisation Settings"
+                            >
+                                <Settings :size="18" />
+                            </RouterLink>
                         </div>
                     </div>
 
@@ -185,27 +197,43 @@ const isActive = (path: string) => {
                     </nav>
 
                     <div class="border-t border-gray-300 pt-4 mb-4">
-                        <div class="relative mb-3">
-                            <select
-                                :value="orgStore.currentOrgId"
-                                class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-white"
-                                @change="
-                                    orgStore.setCurrentOrg(
-                                        Number(
-                                            ($event.target as HTMLInputElement)
-                                                .value
+                        <div class="flex items-center gap-2">
+                            <div class="relative flex-1">
+                                <select
+                                    :value="orgStore.currentOrgId"
+                                    class="w-full pr-8 pl-3 py-2 border border-gray-300 rounded text-sm bg-white appearance-none cursor-pointer"
+                                    @change="
+                                        orgStore.setCurrentOrg(
+                                            Number(
+                                                (
+                                                    $event.target as HTMLInputElement
+                                                ).value
+                                            )
                                         )
-                                    )
-                                "
-                            >
-                                <option
-                                    v-for="org in orgStore.organisations"
-                                    :key="org.id"
-                                    :value="org.id"
+                                    "
                                 >
-                                    {{ org.name }}
-                                </option>
-                            </select>
+                                    <option
+                                        v-for="org in orgStore.organisations"
+                                        :key="org.id"
+                                        :value="org.id"
+                                    >
+                                        {{ org.name }}
+                                    </option>
+                                </select>
+                                <ChevronDown
+                                    :size="16"
+                                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"
+                                />
+                            </div>
+                            <RouterLink
+                                v-if="orgStore.currentOrgId"
+                                :to="`/organisations/${orgStore.currentOrgId}/settings`"
+                                class="p-2 border border-gray-300 rounded hover:bg-gray-100 text-gray-500 hover:text-gray-900 transition-colors flex items-center justify-center shrink-0"
+                                title="Organisation Settings"
+                                @click="mobileMenuOpen = false"
+                            >
+                                <Settings :size="18" />
+                            </RouterLink>
                         </div>
                     </div>
 
