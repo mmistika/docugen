@@ -27,4 +27,16 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
     List<DocumentDTO> findAllByOrg(Long orgId);
 
     Optional<Document> findByDocumentIdAndOrganisationOrganisationId(Long id, Long orgId);
+
+    long countByOrganisationOrganisationId(Long orgId);
+
+    @Query("""
+                SELECT CAST(d.createdAt AS LocalDate), COUNT(d)
+                FROM Document d
+                WHERE d.organisation.organisationId = :orgId
+                  AND d.createdAt >= :since
+                GROUP BY CAST(d.createdAt AS LocalDate)
+                ORDER BY CAST(d.createdAt AS LocalDate) ASC
+            """)
+    List<Object[]> findDailyUsageTrendsRaw(Long orgId, java.time.LocalDateTime since);
 }

@@ -23,4 +23,6 @@ public interface TemplateRepository extends JpaRepository<Template, Long> {
 
 
     Optional<Template> findByTemplateIdAndOrganisation_OrganisationId(Long id, Long orgId);
+
+    long countByOrganisationOrganisationId(Long orgId);
 }

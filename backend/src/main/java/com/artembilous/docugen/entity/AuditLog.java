@@ -42,7 +42,6 @@ public class AuditLog {
     @Column(updatable = false)
     private LocalDateTime timestamp;
 
-    @Lob
     @Column(columnDefinition = "TEXT")
     private String metadata;
 }

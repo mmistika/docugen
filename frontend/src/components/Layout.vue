@@ -1,7 +1,17 @@
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue';
 import { RouterLink, RouterView, useRoute } from 'vue-router';
-import { Building2, ChevronDown, Files, FileText, Menu, ScrollText, Users, X } from '@lucide/vue';
+import {
+    Building2,
+    ChevronDown,
+    Files,
+    FileText,
+    LayoutDashboard,
+    Menu,
+    ScrollText,
+    Users,
+    X
+} from '@lucide/vue';
 import { useAuthStore } from '@/stores/auth';
 import { useOrgStore } from '@/stores/org.ts';
 
@@ -12,11 +22,11 @@ const orgStore = useOrgStore();
 const mobileMenuOpen = ref(false);
 
 const navigation = [
-    //{ name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { name: 'Organisations', path: '/organisations', icon: Building2 }
 ];
 
 const orgNavigation = [
+    { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { name: 'Members', path: '/members', icon: Users },
     { name: 'Templates', path: '/templates', icon: FileText },
     { name: 'Documents', path: '/documents', icon: Files },

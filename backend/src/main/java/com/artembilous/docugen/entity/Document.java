@@ -36,7 +36,6 @@ public class Document {
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     private DocumentStatus status;
 
-    @Lob
     @Column(columnDefinition = "TEXT")
     private String data;
 

@@ -48,7 +48,8 @@ VALUES ('template:view'),
        ('document:view'),
        ('document:generate'),
        ('organisation:manage'),
-       ('members:manage');
+       ('members:manage'),
+       ('statistics:view');
 
 CREATE TABLE roles_permissions
 (

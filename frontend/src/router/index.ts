@@ -7,7 +7,7 @@ const routes = [
         path: '/',
         name: 'home',
         component: () => import('@/components/Layout.vue'),
-        redirect: '/organisations',
+        redirect: '/dashboard',
         children: [
             {
                 path: 'profile',
@@ -24,11 +24,11 @@ const routes = [
                 name: 'org-settings',
                 component: () => import('@/views/OrganisationSettingsView.vue')
             },
-            // {
-            //     path: 'dashboard',
-            //     name: 'dashboard',
-            //     component: () => import('@/views/DashboardView.vue')
-            // },
+            {
+                path: 'dashboard',
+                name: 'dashboard',
+                component: () => import('@/views/DashboardView.vue')
+            },
             {
                 path: 'members',
                 name: 'members',

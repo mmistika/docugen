@@ -28,11 +28,9 @@ public class TemplateVersion {
     @Column(nullable = false)
     private Integer version;
 
-    @Lob
     @Column(columnDefinition = "TEXT", nullable = false)
     private String manifest;
 
-    @Lob
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 

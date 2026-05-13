@@ -11,6 +11,7 @@ import type {
     RoleUpdateRequest
 } from '@/types/rbac.ts';
 import type { AuditLogDTO } from '@/types/audit.ts';
+import type { DashboardDataDTO } from '@/types/dashboard.ts';
 import { useNotificationStore } from '@/stores/notification';
 
 const apiInstance: AxiosInstance = axios.create({
@@ -223,6 +224,12 @@ const organisations = {
             const res = await apiInstance.get(`/org/${orgId}/audit`, {
                 params
             });
+            return res.data;
+        }
+    },
+    dashboard: {
+        async get(orgId: number): Promise<DashboardDataDTO> {
+            const res = await apiInstance.get(`/org/${orgId}/dashboard`);
             return res.data;
         }
     }
