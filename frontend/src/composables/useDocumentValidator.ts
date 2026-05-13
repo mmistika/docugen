@@ -27,6 +27,16 @@ function validateField(field: Field, value: string): string | null {
         if (field.maxValue != null && num > field.maxValue) {
             return `Maximum value is ${field.maxValue}.`;
         }
+        if (field.decimalPlaces != null) {
+            const parts = value.split('.');
+            const decimalPart = parts[1];
+            const actualDecimals = decimalPart
+                ? decimalPart.replace(/0+$/, '').length
+                : 0;
+            if (actualDecimals > field.decimalPlaces) {
+                return `Maximum of ${field.decimalPlaces} decimal place(s) allowed.`;
+            }
+        }
     }
 
     return null;
