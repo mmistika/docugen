@@ -11,11 +11,12 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +25,7 @@ public class TemplateService {
     private final TemplateRepository templateRepository;
     private final TemplateVersionRepository versionRepository;
     private final AuditService auditService;
+    private final ObjectMapper objectMapper;
 
     @PreAuthorize("hasPermission(#orgId, 'template:view')")
     public List<TemplateDTO> getAll(User user, Long orgId) {
@@ -75,6 +77,7 @@ public class TemplateService {
     @Transactional
     @PreAuthorize("hasPermission(#orgId, 'template:update')")
     public Long update(User user, Long orgId, Long templateId, TemplateUpdateRequest req) {
+        validateTemplate(req.manifest(), req.content());
 
         Template template;
         boolean isNewTemplate = (templateId == null);
@@ -164,5 +167,81 @@ public class TemplateService {
         metadata.put("templateName", template.getName());
         metadata.put("version", draft.getVersion());
         auditService.log(orgId, user, AuditEntityType.TEMPLATE, template.getTemplateId(), AuditAction.TEMPLATE_PUBLISHED, metadata);
+    }
+
+    private void validateTemplate(String manifestStr, String content) {
+        if (manifestStr == null || manifestStr.isBlank()) {
+            throw new IllegalArgumentException("Template manifest cannot be empty");
+        }
+
+        JsonNode manifest;
+        try {
+            manifest = objectMapper.readTree(manifestStr);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid manifest JSON format: " + e.getMessage(), e);
+        }
+
+        Set<String> declaredFields = new HashSet<>();
+        validateFieldsList(manifest.get("fields"), declaredFields);
+        validateFieldsList(manifest.get("inline_fields"), declaredFields);
+
+        // Validate placeholders in content HTML
+        if (content != null) {
+            Matcher matcher = Pattern.compile("\\{([a-zA-Z0-9_.-]+)}").matcher(content);
+            while (matcher.find()) {
+                String placeholder = matcher.group(1);
+                if (!declaredFields.contains(placeholder)) {
+                    throw new IllegalArgumentException("Placeholder '" + placeholder + "' found in template content is not declared in the manifest");
+                }
+            }
+        }
+    }
+
+    private void validateFieldsList(JsonNode fieldsNode, Set<String> declaredFields) {
+        if (fieldsNode == null) return;
+        if (!fieldsNode.isArray()) {
+            throw new IllegalArgumentException("Fields metadata must be a JSON array");
+        }
+
+        for (JsonNode field : fieldsNode) {
+            JsonNode nameNode = field.get("name");
+            if (nameNode == null || nameNode.asString().isBlank()) {
+                throw new IllegalArgumentException("Field name cannot be empty");
+            }
+            String fieldName = nameNode.asString().trim();
+            if (declaredFields.contains(fieldName)) {
+                throw new IllegalArgumentException("Duplicate field name declared in manifest: " + fieldName);
+            }
+            declaredFields.add(fieldName);
+
+            JsonNode typeNode = field.get("type");
+            if (typeNode == null || typeNode.asString().isBlank()) {
+                throw new IllegalArgumentException("Field '" + fieldName + "' must have a valid type");
+            }
+            String type = typeNode.asString().toLowerCase().trim();
+            if (!Set.of("text", "number").contains(type)) {
+                throw new IllegalArgumentException("Field '" + fieldName + "' has invalid type: " + type);
+            }
+
+            // Validate constraints types if specified
+            if ("text".equals(type)) {
+                if (field.has("minLength") && !field.get("minLength").isNull() && !field.get("minLength").isNumber()) {
+                    throw new IllegalArgumentException("Field '" + fieldName + "' minLength must be a valid number");
+                }
+                if (field.has("maxLength") && !field.get("maxLength").isNull() && !field.get("maxLength").isNumber()) {
+                    throw new IllegalArgumentException("Field '" + fieldName + "' maxLength must be a valid number");
+                }
+            } else if ("number".equals(type)) {
+                if (field.has("minValue") && !field.get("minValue").isNull() && !field.get("minValue").isNumber()) {
+                    throw new IllegalArgumentException("Field '" + fieldName + "' minValue must be a valid number");
+                }
+                if (field.has("maxValue") && !field.get("maxValue").isNull() && !field.get("maxValue").isNumber()) {
+                    throw new IllegalArgumentException("Field '" + fieldName + "' maxValue must be a valid number");
+                }
+                if (field.has("decimalPlaces") && !field.get("decimalPlaces").isNull() && !field.get("decimalPlaces").isNumber()) {
+                    throw new IllegalArgumentException("Field '" + fieldName + "' decimalPlaces must be a valid number");
+                }
+            }
+        }
     }
 }

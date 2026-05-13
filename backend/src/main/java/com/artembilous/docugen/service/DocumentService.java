@@ -17,6 +17,7 @@ import tools.jackson.databind.ObjectMapper;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 @Service
@@ -145,19 +146,81 @@ public class DocumentService {
     }
 
     private void validate(JsonNode manifest, Map<String, String> data) {
-        check(manifest.get("fields"), data);
-        check(manifest.get("inline_fields"), data);
+        Set<String> declaredFields = new java.util.HashSet<>();
+        checkFields(manifest.get("fields"), data, declaredFields);
+        checkFields(manifest.get("inline_fields"), data, declaredFields);
+
+        for (String key : data.keySet()) {
+            if (!declaredFields.contains(key)) {
+                throw new IllegalArgumentException("Unrecognized field provided in document data: " + key);
+            }
+        }
     }
 
-    private void check(JsonNode fields, Map<String, String> data) {
+    private void checkFields(JsonNode fields, Map<String, String> data, Set<String> declaredFields) {
         if (fields == null) return;
 
         for (JsonNode f : fields) {
             String name = f.get("name").asString();
+            declaredFields.add(name);
             boolean required = f.get("required").asBoolean(false);
+            String val = data.get(name);
 
-            if (required && (data.get(name) == null || data.get(name).isBlank())) {
-                throw new IllegalArgumentException("Missing required field: " + name);
+            if (val == null || val.isBlank()) {
+                if (required) {
+                    throw new IllegalArgumentException("Missing required field: " + name);
+                }
+                continue;
+            }
+
+            String type = f.has("type") ? f.get("type").asString().toLowerCase().trim() : "text";
+
+            if ("text".equals(type)) {
+                if (f.has("minLength") && !f.get("minLength").isNull()) {
+                    int minLen = f.get("minLength").asInt();
+                    if (val.length() < minLen) {
+                        throw new IllegalArgumentException("Field '" + name + "' length is " + val.length() + " which violates minLength constraint of " + minLen);
+                    }
+                }
+                if (f.has("maxLength") && !f.get("maxLength").isNull()) {
+                    int maxLen = f.get("maxLength").asInt();
+                    if (val.length() > maxLen) {
+                        throw new IllegalArgumentException("Field '" + name + "' length is " + val.length() + " which violates maxLength constraint of " + maxLen);
+                    }
+                }
+            } else if ("number".equals(type)) {
+                double doubleVal;
+                try {
+                    doubleVal = Double.parseDouble(val.trim());
+                } catch (NumberFormatException e) {
+                    throw new IllegalArgumentException("Field '" + name + "' must be a valid number, but was: " + val);
+                }
+
+                if (f.has("minValue") && !f.get("minValue").isNull()) {
+                    double min = f.get("minValue").asDouble();
+                    if (doubleVal < min) {
+                        throw new IllegalArgumentException("Field '" + name + "' value " + doubleVal + " violates minValue constraint of " + min);
+                    }
+                }
+                if (f.has("maxValue") && !f.get("maxValue").isNull()) {
+                    double max = f.get("maxValue").asDouble();
+                    if (doubleVal > max) {
+                        throw new IllegalArgumentException("Field '" + name + "' value " + doubleVal + " violates maxValue constraint of " + max);
+                    }
+                }
+                if (f.has("decimalPlaces") && !f.get("decimalPlaces").isNull()) {
+                    int maxDecimals = f.get("decimalPlaces").asInt();
+                    String trimmed = val.trim();
+                    int dotIdx = trimmed.indexOf('.');
+                    int actualDecimals = 0;
+                    if (dotIdx >= 0) {
+                        String decimalsPart = trimmed.substring(dotIdx + 1).replaceAll("0+$", "");
+                        actualDecimals = decimalsPart.length();
+                    }
+                    if (actualDecimals > maxDecimals) {
+                        throw new IllegalArgumentException("Field '" + name + "' violates decimalPlaces constraint: maximum permitted is " + maxDecimals + ", but got " + actualDecimals);
+                    }
+                }
             }
         }
     }
