@@ -97,6 +97,17 @@ CREATE TABLE documents
     created_at          TIMESTAMP       DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE api_tokens
+(
+    token_id        BIGSERIAL PRIMARY KEY,
+    name            VARCHAR(255)        NOT NULL,
+    hash            VARCHAR(255) UNIQUE NOT NULL,
+    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_active       BOOLEAN   DEFAULT TRUE,
+    expires_at      TIMESTAMP,
+    organisation_id BIGINT              NOT NULL REFERENCES organisations (organisation_id) ON DELETE CASCADE
+);
+
 CREATE TABLE audit_logs
 (
     log_id          BIGSERIAL PRIMARY KEY,
@@ -107,6 +118,13 @@ CREATE TABLE audit_logs
     action          VARCHAR(50) NOT NULL,
     timestamp       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     metadata        TEXT      DEFAULT ''
+);
+
+CREATE TABLE api_tokens_permissions
+(
+    token_id      BIGINT REFERENCES api_tokens (token_id) ON DELETE CASCADE,
+    permission_id BIGINT REFERENCES permissions (permission_id) ON DELETE CASCADE,
+    PRIMARY KEY (token_id, permission_id)
 );
 
 -- Constraints
@@ -142,3 +160,4 @@ CREATE INDEX idx_memberships_org ON memberships (organisation_id);
 CREATE INDEX idx_roles_org ON roles (organisation_id);
 CREATE INDEX idx_templates_org ON templates (organisation_id);
 CREATE INDEX idx_template_versions_latest ON template_versions (template_id, status);
+CREATE INDEX idx_api_tokens_hash ON api_tokens (hash);

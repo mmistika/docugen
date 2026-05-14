@@ -5,7 +5,8 @@ import com.artembilous.docugen.exception.RegistrationIncompleteException;
 import com.artembilous.docugen.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.*;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.security.core.Authentication;
@@ -28,6 +29,10 @@ public class RegistrationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth instanceof ApiTokenAuthenticationToken) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         if (auth == null || !auth.isAuthenticated()) {
             filterChain.doFilter(request, response);
             return;

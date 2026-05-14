@@ -35,6 +35,10 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
     }
 
     private boolean check(Authentication auth, Long orgId, String permissionName) {
+        if (auth instanceof ApiTokenAuthenticationToken apiTokenAuth) {
+            return apiTokenAuth.getOrganisationId().equals(orgId) && apiTokenAuth.hasPermission(permissionName);
+        }
+
         if (!(auth instanceof UserAuthenticationToken userAuth)) {
             return false;
         }
