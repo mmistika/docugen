@@ -12,6 +12,11 @@ import type {
 } from '@/types/rbac.ts';
 import type { AuditLogDTO } from '@/types/audit.ts';
 import type { DashboardDataDTO } from '@/types/dashboard.ts';
+import type {
+    ApiTokenDTO,
+    CreateApiTokenRequest,
+    CreateApiTokenResponse
+} from '@/types/tokens.ts';
 import { useNotificationStore } from '@/stores/notification';
 
 const apiInstance: AxiosInstance = axios.create({
@@ -127,6 +132,27 @@ const organisations = {
         },
         async deleteRole(orgId: number, roleName: string): Promise<void> {
             await apiInstance.delete(`/org/${orgId}/rbac/roles/${roleName}`);
+        }
+    },
+    tokens: {
+        async list(orgId: number): Promise<ApiTokenDTO[]> {
+            const res = await apiInstance.get(`/org/${orgId}/settings/tokens`);
+            return res.data;
+        },
+        async create(
+            orgId: number,
+            req: CreateApiTokenRequest
+        ): Promise<CreateApiTokenResponse> {
+            const res = await apiInstance.post(
+                `/org/${orgId}/settings/tokens`,
+                req
+            );
+            return res.data;
+        },
+        async delete(orgId: number, tokenId: number): Promise<void> {
+            await apiInstance.delete(
+                `/org/${orgId}/settings/tokens/${tokenId}`
+            );
         }
     },
     templates: {
