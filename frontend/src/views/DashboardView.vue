@@ -301,11 +301,20 @@ const formatRelativeTime = (dateStr: string) => {
                                 <p class="text-gray-800 font-semibold truncate">
                                     {{ formatAction(activity.action) }}
                                 </p>
-                                <p class="text-gray-500 truncate">
+                                <p
+                                    class="text-gray-500 truncate flex items-center gap-1.5 flex-wrap"
+                                >
                                     by
-                                    {{
-                                        activity.userName || activity.userEmail
-                                    }}
+                                    <span class="font-medium text-gray-700">{{
+                                        activity.userName ||
+                                        activity.userEmail ||
+                                        'System'
+                                    }}</span>
+                                    <span
+                                        v-if="activity.isToken"
+                                        class="inline-flex px-1.5 py-0.5 rounded text-[9px] font-semibold bg-blue-50 text-blue-400 border border-blue-100 uppercase tracking-wide"
+                                        >API Token</span
+                                    >
                                 </p>
                             </div>
                             <span

@@ -207,8 +207,22 @@ const BADGE = 'bg-gray-100 text-gray-700 border border-gray-200';
             </template>
 
             <template #cell:user="{ item }">
-                <div class="text-sm text-gray-900">{{ item.userName }}</div>
-                <div class="text-xs text-gray-500">{{ item.userEmail }}</div>
+                <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-sm text-gray-900 font-medium">{{
+                        item.userName
+                    }}</span>
+                    <span
+                        v-if="item.isToken"
+                        class="inline-flex px-1.5 py-0.5 rounded text-[9px] font-semibold bg-blue-50 text-blue-400 border border-blue-100 uppercase tracking-wide"
+                        >API Token</span
+                    >
+                </div>
+                <div
+                    v-if="!item.isToken && item.userEmail"
+                    class="text-xs text-gray-500"
+                >
+                    {{ item.userEmail }}
+                </div>
             </template>
 
             <template #cell:action="{ item }">
@@ -237,10 +251,24 @@ const BADGE = 'bg-gray-100 text-gray-700 border border-gray-200';
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2 mb-1.5 flex-wrap">
                             <div>
-                                <div class="text-sm text-gray-900">
-                                    {{ item.userName }}
+                                <div
+                                    class="flex items-center gap-1.5 flex-wrap"
+                                >
+                                    <span
+                                        class="text-sm text-gray-900 font-medium"
+                                    >
+                                        {{ item.userName }}
+                                    </span>
+                                    <span
+                                        v-if="item.isToken"
+                                        class="inline-flex px-1.5 py-0.5 rounded text-[9px] font-semibold bg-blue-50 text-blue-600 border border-blue-100 uppercase tracking-wide"
+                                        >API Token</span
+                                    >
                                 </div>
-                                <div class="text-xs text-gray-500">
+                                <div
+                                    v-if="!item.isToken && item.userEmail"
+                                    class="text-xs text-gray-500"
+                                >
                                     {{ item.userEmail }}
                                 </div>
                             </div>

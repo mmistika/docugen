@@ -3,9 +3,10 @@ export interface AuditLogDTO {
     action: string;
     entityType: string;
     entityId: number;
-    userId: number;
-    userEmail: string;
+    userId: number | null;
+    userEmail: string | null;
     userName: string;
+    isToken: boolean;
     metadata: string;
     timestamp: string;
 }

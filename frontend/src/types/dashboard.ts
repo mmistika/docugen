@@ -7,7 +7,8 @@ export interface SimplifiedAuditLogDTO {
     id: number;
     action: string;
     userName: string | null;
-    userEmail: string;
+    userEmail: string | null;
+    isToken: boolean;
     timestamp: string;
 }
 
