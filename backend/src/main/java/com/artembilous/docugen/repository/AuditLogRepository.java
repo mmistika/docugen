@@ -12,8 +12,9 @@ import java.util.List;
 public interface AuditLogRepository extends JpaRepository<AuditLog, Long> {
 
     @Query("""
-                SELECT a.logId, a.action, a.user.name, a.user.surname, a.user.email, a.timestamp
+                SELECT a.logId, a.action, u.name, u.surname, u.email, a.timestamp, a.tokenName
                 FROM AuditLog a
+                LEFT JOIN a.user u
                 WHERE a.organisation.organisationId = :orgId
                 ORDER BY a.timestamp DESC
             """)

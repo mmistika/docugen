@@ -112,7 +112,9 @@ CREATE TABLE audit_logs
 (
     log_id          BIGSERIAL PRIMARY KEY,
     organisation_id BIGINT      NOT NULL REFERENCES organisations (organisation_id) ON DELETE RESTRICT,
-    user_id         BIGINT      NOT NULL REFERENCES users (user_id) ON DELETE RESTRICT,
+    user_id    BIGINT REFERENCES users (user_id) ON DELETE RESTRICT,
+    token_id   BIGINT REFERENCES api_tokens (token_id) ON DELETE SET NULL,
+    token_name VARCHAR(255),
     entity_type     VARCHAR(50) NOT NULL,
     entity_id       BIGINT      NOT NULL,
     action          VARCHAR(50) NOT NULL,

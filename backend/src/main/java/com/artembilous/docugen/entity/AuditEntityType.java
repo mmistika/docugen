@@ -6,5 +6,6 @@ public enum AuditEntityType {
     ORGANISATION,
     ROLE,
     MEMBERSHIP,
-    USER
+    USER,
+    API_TOKEN
 }

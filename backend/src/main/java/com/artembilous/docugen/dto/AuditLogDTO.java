@@ -13,6 +13,7 @@ public record AuditLogDTO(
         Long userId,
         String userEmail,
         String userName,
+        Boolean isToken,
 
         String metadata,
 

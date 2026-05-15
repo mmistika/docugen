@@ -24,8 +24,15 @@ public class AuditLog {
     private Organisation organisation;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "token_id")
+    private ApiToken apiToken;
+
+    @Column(name = "token_name")
+    private String tokenName;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

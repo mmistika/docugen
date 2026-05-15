@@ -19,4 +19,7 @@ public enum AuditAction {
     MEMBER_ROLES_UPDATED,
 
     USER_INVITED,
+
+    API_TOKEN_GENERATED,
+    API_TOKEN_DELETED,
 }

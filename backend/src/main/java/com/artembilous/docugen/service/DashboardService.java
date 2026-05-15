@@ -40,12 +40,18 @@ public class DashboardService {
                 .map(row -> {
                     String name = (String) row[2];
                     String surname = (String) row[3];
-                    String fullName = name != null ? name + (surname != null ? " " + surname : "") : null;
+                    String email = (String) row[4];
+                    String tokenName = (String) row[6];
+                    boolean isToken = tokenName != null;
+                    String fullName = name != null
+                            ? name + (surname != null ? " " + surname : "")
+                            : (isToken ? tokenName : "System");
                     return new SimplifiedAuditLogDTO(
                             (Long) row[0],
                             ((AuditAction) row[1]).name(),
                             fullName,
-                            (String) row[4],
+                            email,
+                            isToken,
                             (LocalDateTime) row[5]
                     );
                 })

@@ -7,6 +7,7 @@ public record SimplifiedAuditLogDTO(
         String action,
         String userName,
         String userEmail,
+        Boolean isToken,
         LocalDateTime timestamp
 ) {
 }
