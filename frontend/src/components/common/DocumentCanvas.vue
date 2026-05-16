@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { ZoomIn, ZoomOut } from '@lucide/vue';
 
 const props = withDefaults(
@@ -18,9 +18,31 @@ const MAX_SCALE = 2.0;
 
 const scale = ref(props.initialScale);
 
+const contentRef = ref<HTMLElement | null>(null);
+const contentHeight = ref(A4_H);
+
+let resizeObserver: ResizeObserver | null = null;
+
+onMounted(() => {
+    if (contentRef.value) {
+        resizeObserver = new ResizeObserver((entries) => {
+            for (const entry of entries) {
+                contentHeight.value = Math.max(A4_H, entry.target.clientHeight);
+            }
+        });
+        resizeObserver.observe(contentRef.value);
+    }
+});
+
+onBeforeUnmount(() => {
+    if (resizeObserver) {
+        resizeObserver.disconnect();
+    }
+});
+
 const sheetStyle = computed(() => ({
     width: `${A4_W}px`,
-    height: `${A4_H}px`,
+    height: `${contentHeight.value}px`,
     transform: `scale(${scale.value})`,
     transformOrigin: 'top left',
     position: 'absolute' as const
@@ -28,7 +50,7 @@ const sheetStyle = computed(() => ({
 
 const wrapperStyle = computed(() => ({
     width: `${A4_W * scale.value}px`,
-    height: `${A4_H * scale.value}px`,
+    height: `${contentHeight.value * scale.value}px`,
     flexShrink: 0,
     position: 'relative' as const
 }));
@@ -86,11 +108,102 @@ const wrapperStyle = computed(() => ({
             <div :style="wrapperStyle">
                 <div
                     :style="sheetStyle"
-                    class="bg-white border border-gray-300 shadow-sm"
+                    class="bg-white border border-gray-300 shadow-md rounded-sm"
                 >
-                    <slot />
+                    <div
+                        ref="contentRef"
+                        class="w-full document-canvas-content"
+                    >
+                        <slot />
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </template>
+
+<style>
+/* Document unified styling and typography */
+.document-canvas-content {
+    box-sizing: border-box;
+    font-family:
+        'Inter',
+        system-ui,
+        -apple-system,
+        sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #1f2937;
+}
+
+.document-canvas-content > * {
+    padding: 28mm 20mm;
+    box-sizing: border-box;
+    min-height: 1123px;
+}
+
+.document-canvas-content p {
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+}
+
+.document-canvas-content h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    color: #111827;
+    line-height: 1.25;
+}
+
+.document-canvas-content h2 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-top: 1.25rem;
+    margin-bottom: 0.5rem;
+    color: #111827;
+    line-height: 1.25;
+}
+
+.document-canvas-content h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    color: #111827;
+    line-height: 1.25;
+}
+
+.document-canvas-content ul {
+    list-style-type: disc;
+    padding-left: 1.5rem;
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+}
+
+.document-canvas-content ol {
+    list-style-type: decimal;
+    padding-left: 1.5rem;
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+}
+
+.document-canvas-content li {
+    margin-bottom: 0.25rem;
+}
+
+.document-canvas-content strong {
+    font-weight: 600;
+    color: #111827;
+}
+
+.document-canvas-content em {
+    font-style: italic;
+}
+
+/* Prevent collapse of empty paragraphs in both editor (ProseMirror) and static view */
+.document-canvas-content p:empty::before,
+.document-canvas-content .ProseMirror p:empty::before {
+    content: '\00a0'; /* Non-breaking space */
+}
+</style>

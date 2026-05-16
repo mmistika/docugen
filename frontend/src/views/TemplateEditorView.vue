@@ -167,9 +167,7 @@ const highlightedHtml = computed(
                 </div>
                 <div ref="documentAreaRef" class="flex-1 overflow-hidden">
                     <DocumentCanvas v-show="activeTab === 'document'">
-                        <div class="h-full w-full p-[20mm]">
-                            <EditorContent :editor="editor" />
-                        </div>
+                        <EditorContent :editor="editor" />
                     </DocumentCanvas>
                     <div v-if="activeTab === 'manifest'" class="p-4 lg:p-8">
                         <div
@@ -206,11 +204,6 @@ const highlightedHtml = computed(
 <style>
 .ProseMirror {
     outline: none;
-}
-.ProseMirror p {
-    margin-top: 0.5em;
-    margin-bottom: 0.5em;
-    line-height: 1.5;
 }
 pre code.hljs {
     padding: 0;

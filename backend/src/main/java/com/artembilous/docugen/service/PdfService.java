@@ -47,10 +47,83 @@ public class PdfService {
         long startTime = System.currentTimeMillis();
         log.info("Initiating PDF generation request (HTML length: {})...", html.length());
 
+        String styledHtml = "<!DOCTYPE html>\n" +
+                "<html>\n" +
+                "<head>\n" +
+                "<meta charset=\"UTF-8\">\n" +
+                "<style>\n" +
+                "body {\n" +
+                "    margin: 0;\n" +
+                "    padding: 0;\n" +
+                "    font-family: 'Inter', system-ui, -apple-system, sans-serif;\n" +
+                "    font-size: 14px;\n" +
+                "    line-height: 1.6;\n" +
+                "    color: #1f2937;\n" +
+                "}\n" +
+                "p {\n" +
+                "    margin-top: 0;\n" +
+                "    margin-bottom: 0.75rem;\n" +
+                "}\n" +
+                "h1 {\n" +
+                "    font-size: 1.8rem;\n" +
+                "    font-weight: 700;\n" +
+                "    margin-top: 1.5rem;\n" +
+                "    margin-bottom: 0.75rem;\n" +
+                "    color: #111827;\n" +
+                "    line-height: 1.25;\n" +
+                "}\n" +
+                "h2 {\n" +
+                "    font-size: 1.4rem;\n" +
+                "    font-weight: 600;\n" +
+                "    margin-top: 1.25rem;\n" +
+                "    margin-bottom: 0.5rem;\n" +
+                "    color: #111827;\n" +
+                "    line-height: 1.25;\n" +
+                "}\n" +
+                "h3 {\n" +
+                "    font-size: 1.2rem;\n" +
+                "    font-weight: 600;\n" +
+                "    margin-top: 1rem;\n" +
+                "    margin-bottom: 0.5rem;\n" +
+                "    color: #111827;\n" +
+                "    line-height: 1.25;\n" +
+                "}\n" +
+                "ul {\n" +
+                "    list-style-type: disc;\n" +
+                "    padding-left: 1.5rem;\n" +
+                "    margin-top: 0;\n" +
+                "    margin-bottom: 0.75rem;\n" +
+                "}\n" +
+                "ol {\n" +
+                "    list-style-type: decimal;\n" +
+                "    padding-left: 1.5rem;\n" +
+                "    margin-top: 0;\n" +
+                "    margin-bottom: 0.75rem;\n" +
+                "}\n" +
+                "li {\n" +
+                "    margin-bottom: 0.25rem;\n" +
+                "}\n" +
+                "strong {\n" +
+                "    font-weight: 600;\n" +
+                "    color: #111827;\n" +
+                "}\n" +
+                "em {\n" +
+                "    font-style: italic;\n" +
+                "}\n" +
+                "p:empty::before {\n" +
+                "    content: \"\\00a0\";\n" +
+                "}\n" +
+                "</style>\n" +
+                "</head>\n" +
+                "<body>\n" +
+                html + "\n" +
+                "</body>\n" +
+                "</html>";
+
         try (BrowserContext context = browser.newContext();
              Page page = context.newPage()) {
 
-            page.setContent(html, new Page.SetContentOptions().setWaitUntil(WaitUntilState.NETWORKIDLE));
+            page.setContent(styledHtml, new Page.SetContentOptions().setWaitUntil(WaitUntilState.NETWORKIDLE));
 
             byte[] pdf = page.pdf(new Page.PdfOptions()
                     .setFormat("A4")

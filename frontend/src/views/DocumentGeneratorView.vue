@@ -318,8 +318,7 @@ watch(
                 >
                     <DocumentCanvas>
                         <div
-                            class="h-full w-full prose max-w-none"
-                            style="padding: 28mm 20mm"
+                            class="h-full w-full"
                             @input="onPreviewInput"
                             v-html="renderedContent"
                         />
