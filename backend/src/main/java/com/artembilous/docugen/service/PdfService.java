@@ -110,6 +110,27 @@ public class PdfService {
                 "em {\n" +
                 "    font-style: italic;\n" +
                 "}\n" +
+                "blockquote {\n" +
+                "    border-left: 3px solid #000000;\n" +
+                "    padding-left: 1rem;\n" +
+                "    margin-left: 0;\n" +
+                "    margin-right: 0;\n" +
+                "    margin-top: 1rem;\n" +
+                "    margin-bottom: 1rem;\n" +
+                "    color: #4b5563;\n" +
+                "    font-style: italic;\n" +
+                "}\n" +
+                "hr {\n" +
+                "    border: 0;\n" +
+                "    border-top: 1px solid #e5e7eb;\n" +
+                "    margin-top: 1.5rem;\n" +
+                "    margin-bottom: 1.5rem;\n" +
+                "}\n" +
+                "mark {\n" +
+                "    background-color: #fef08a;\n" +
+                "    border-radius: 0.125rem;\n" +
+                "    padding: 0 0.125rem;\n" +
+                "}\n" +
                 "p:empty::before {\n" +
                 "    content: \"\\00a0\";\n" +
                 "}\n" +

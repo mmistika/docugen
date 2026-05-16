@@ -10,6 +10,7 @@ import { useTemplateEditor } from '@/composables/useTemplateEditor';
 import FieldSidebar from '@/components/editor/FieldSidebar.vue';
 import FieldPropertiesPanel from '@/components/editor/FieldPropertiesPanel.vue';
 import DocumentCanvas from '@/components/common/DocumentCanvas.vue';
+import EditorToolbar from '@/components/editor/EditorToolbar.vue';
 
 hljs.registerLanguage('json', hljsJson);
 hljs.registerLanguage('xml', hljsXml);
@@ -165,6 +166,10 @@ const highlightedHtml = computed(
                         </button>
                     </nav>
                 </div>
+                <EditorToolbar
+                    v-if="activeTab === 'document' && editor"
+                    :editor="editor"
+                />
                 <div ref="documentAreaRef" class="flex-1 overflow-hidden">
                     <DocumentCanvas v-show="activeTab === 'document'">
                         <EditorContent :editor="editor" />

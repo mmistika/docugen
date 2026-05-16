@@ -9,6 +9,11 @@ import type { Field, FieldType } from '@/types/field';
 import { createField } from '@/types/field';
 import type { TemplateVersionStatus } from '@/types/template';
 import { InlineFieldNode } from '@/editor/extensions/InlineFieldNode';
+import TextAlign from '@tiptap/extension-text-align';
+import { FontSize, TextStyle } from '@tiptap/extension-text-style';
+import { Color } from '@tiptap/extension-color';
+import { Highlight } from '@tiptap/extension-highlight';
+import { FontFamily } from '@tiptap/extension-font-family';
 
 const areFieldsEqual = (a: Field[], b: Field[]): boolean => {
     if (a.length !== b.length) return false;
@@ -50,10 +55,24 @@ export function useTemplateEditor() {
 
     const editor = useEditor({
         content: '',
-        extensions: [StarterKit, InlineFieldNode],
+        extensions: [
+            StarterKit,
+            InlineFieldNode,
+            TextAlign.configure({
+                types: ['heading', 'paragraph'],
+                alignments: ['left', 'center', 'right', 'justify']
+            }),
+            TextStyle,
+            Color,
+            Highlight.configure({
+                multicolor: true
+            }),
+            FontSize,
+            FontFamily
+        ],
         editorProps: {
             attributes: {
-                class: 'prose max-w-none focus:outline-none min-h-[1056px]'
+                class: 'focus:outline-none'
             }
         },
         onUpdate: ({ editor }) => {
