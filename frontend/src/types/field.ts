@@ -101,8 +101,9 @@ export function createField(
     scope: 'global' | 'inline'
 ): Field {
     const def = FIELD_TYPE_MAP[type];
+    const uniqueSuffix = Math.random().toString(36).substring(2, 9);
     return {
-        id: `${scope}_${Date.now()}`,
+        id: `${scope}_${uniqueSuffix}`,
         name: `${scope}_${type}`,
         type,
         required: false,
