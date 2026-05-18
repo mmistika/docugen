@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue';
-import { Camera, Loader2, Save, Trash2 } from '@lucide/vue';
+import { Loader2, Save } from '@lucide/vue';
 import { useAuthStore } from '@/stores/auth';
 import TabHeader from '@/components/common/TabHeader.vue';
+import ImagePicker from '@/components/common/ImagePicker.vue';
 
 const authStore = useAuthStore();
 const user = authStore.user;
@@ -10,7 +11,6 @@ const user = authStore.user;
 const name = ref(user?.name || '');
 const surname = ref(user?.surname || '');
 const imageUrl = ref<string | null>(user?.image || null);
-const imageFile = ref<File | null>(null);
 
 const hasChanges = computed(() => {
     return (
@@ -23,36 +23,6 @@ const hasChanges = computed(() => {
 const isSaving = ref(false);
 const saveError = ref<string | null>(null);
 const saveSuccess = ref(false);
-
-const fileInputRef = ref<HTMLInputElement | null>(null);
-
-const triggerFileInput = () => {
-    fileInputRef.value?.click();
-};
-
-const handleFileChange = (event: Event) => {
-    const target = event.target as HTMLInputElement;
-    if (target.files && target.files[0]) {
-        const file = target.files[0];
-        imageFile.value = file;
-
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            if (e.target?.result) {
-                imageUrl.value = e.target.result as string;
-            }
-        };
-        reader.readAsDataURL(file);
-    }
-};
-
-const removePicture = () => {
-    imageUrl.value = null;
-    imageFile.value = null;
-    if (fileInputRef.value) {
-        fileInputRef.value.value = '';
-    }
-};
 
 const saveProfile = async () => {
     isSaving.value = true;
@@ -94,59 +64,7 @@ const getInitials = () => {
                 <h2 class="text-sm font-semibold text-gray-900 mb-4">
                     Profile Picture
                 </h2>
-                <div class="flex items-center gap-6">
-                    <div class="relative group">
-                        <img
-                            v-if="imageUrl"
-                            :src="imageUrl"
-                            alt="Profile Avatar"
-                            class="w-20 h-20 rounded-full object-cover border border-gray-300 shadow-sm"
-                        />
-                        <div
-                            v-else
-                            class="w-20 h-20 rounded-full bg-linear-to-tr from-gray-100 to-gray-200 flex items-center justify-center text-lg font-bold text-gray-700 border border-gray-300 shadow-sm select-none"
-                        >
-                            {{ getInitials() }}
-                        </div>
-                        <button
-                            class="absolute bottom-0 right-0 bg-white border border-gray-300 rounded-full p-1.5 cursor-pointer shadow-sm hover:bg-gray-50 transition-colors"
-                            type="button"
-                            @click="triggerFileInput"
-                        >
-                            <Camera :size="16" class="text-gray-600" />
-                        </button>
-                        <input
-                            ref="fileInputRef"
-                            accept="image/*"
-                            class="hidden"
-                            type="file"
-                            @change="handleFileChange"
-                        />
-                    </div>
-                    <div class="flex flex-col gap-2">
-                        <div class="flex items-center gap-2">
-                            <button
-                                class="px-4 py-2 border border-gray-300 hover:bg-gray-50 rounded text-sm font-medium text-gray-700 transition-colors cursor-pointer"
-                                type="button"
-                                @click="triggerFileInput"
-                            >
-                                Upload new picture
-                            </button>
-                            <button
-                                v-if="imageUrl"
-                                class="px-3 py-2 border border-red-200 hover:bg-red-50 rounded text-sm font-medium text-red-600 transition-colors cursor-pointer flex items-center gap-1.5"
-                                type="button"
-                                @click="removePicture"
-                            >
-                                <Trash2 :size="14" />
-                                Remove
-                            </button>
-                        </div>
-                        <p class="text-xs text-gray-400">
-                            JPG, PNG or GIF (max size 1MB recommended)
-                        </p>
-                    </div>
-                </div>
+                <ImagePicker v-model="imageUrl" :initials="getInitials()" />
             </div>
             <div class="p-6 border-b border-gray-300">
                 <h2 class="text-sm font-semibold text-gray-900 mb-4">
