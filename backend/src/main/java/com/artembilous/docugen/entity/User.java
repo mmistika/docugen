@@ -13,7 +13,7 @@ import java.util.Set;
 @Table(name = "users")
 @Getter
 @Setter
-@ToString(exclude = "memberships")
+@ToString(exclude = {"memberships", "image"})
 public class User {
 
     @Id

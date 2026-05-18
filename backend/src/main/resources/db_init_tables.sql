@@ -25,7 +25,8 @@ CREATE TABLE memberships
 (
     membership_id   BIGSERIAL PRIMARY KEY,
     user_id         BIGINT NOT NULL REFERENCES users (user_id) ON DELETE RESTRICT,
-    organisation_id BIGINT NOT NULL REFERENCES organisations (organisation_id) ON DELETE RESTRICT
+    organisation_id BIGINT NOT NULL REFERENCES organisations (organisation_id) ON DELETE RESTRICT,
+    UNIQUE (user_id, organisation_id)
 );
 
 CREATE TABLE roles

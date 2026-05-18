@@ -35,7 +35,8 @@ public class UserService {
     public User getOrCreate(Jwt jwt) {
 
         String auth0Id = jwt.getSubject();
-        String email = jwt.getClaim("docugen-api/email");
+        String rawEmail = jwt.getClaim("docugen-api/email");
+        String email = rawEmail != null ? rawEmail.trim().toLowerCase() : null;
 
         Optional<User> byAuth0 = userRepository.findByAuth0Id(auth0Id);
         if (byAuth0.isPresent()) {
@@ -86,13 +87,14 @@ public class UserService {
     @Transactional
     @PreAuthorize("hasPermission(#req.orgId(), 'members:manage')")
     public void invite(User inviter, InviteUserRequest req) {
-        if (inviter.getEmail().equalsIgnoreCase(req.email().trim())) {
+        String invitedEmail = req.email() != null ? req.email().trim().toLowerCase() : "";
+        if (inviter.getEmail().equalsIgnoreCase(invitedEmail)) {
             throw new IllegalArgumentException("You cannot invite yourself to the organisation");
         }
-        User user = userRepository.findByEmail(req.email())
+        User user = userRepository.findByEmail(invitedEmail)
                 .orElseGet(() -> {
                     User u = new User();
-                    u.setEmail(req.email());
+                    u.setEmail(invitedEmail);
                     u.setAuth0Id(null);
                     return userRepository.save(u);
                 });
