@@ -67,16 +67,6 @@ public class UserService {
             @CacheEvict(value = "users", key = "#user.auth0Id"),
             @CacheEvict(value = "registration_status", key = "#user.userId")
     })
-    public void completeRegistration(User user, String name, String surname) {
-        user.setName(name);
-        user.setSurname(surname);
-        userRepository.save(user);
-    }
-
-    @Caching(evict = {
-            @CacheEvict(value = "users", key = "#user.auth0Id"),
-            @CacheEvict(value = "registration_status", key = "#user.userId")
-    })
     public void updateProfile(User user, String name, String surname, byte[] image) {
         user.setName(name);
         user.setSurname(surname);

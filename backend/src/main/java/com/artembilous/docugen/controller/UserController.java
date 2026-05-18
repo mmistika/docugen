@@ -1,6 +1,5 @@
 package com.artembilous.docugen.controller;
 
-import com.artembilous.docugen.dto.CompleteRegistrationRequest;
 import com.artembilous.docugen.dto.InviteUserRequest;
 import com.artembilous.docugen.dto.MeResponse;
 import com.artembilous.docugen.dto.UpdateProfileRequest;
@@ -39,14 +38,7 @@ public class UserController {
 
     @PutMapping("/profile")
     public MeResponse updateProfile(@AuthenticationPrincipal User user, @Valid @RequestBody UpdateProfileRequest req) {
-        byte[] imageBytes = null;
-        if (req.image() != null && !req.image().isBlank()) {
-            String base64Data = req.image();
-            if (base64Data.contains(",")) {
-                base64Data = base64Data.substring(base64Data.indexOf(",") + 1);
-            }
-            imageBytes = java.util.Base64.getDecoder().decode(base64Data);
-        }
+        byte[] imageBytes = decodeBase64Image(req.image());
         userService.updateProfile(user, req.name(), req.surname(), imageBytes);
 
         String newBase64Image = null;
@@ -64,8 +56,20 @@ public class UserController {
     }
 
     @PostMapping("/complete-registration")
-    public void complete(@AuthenticationPrincipal User user, @Valid @RequestBody CompleteRegistrationRequest req) {
-        userService.completeRegistration(user, req.name(), req.surname());
+    public void complete(@AuthenticationPrincipal User user, @Valid @RequestBody UpdateProfileRequest req) {
+        byte[] imageBytes = decodeBase64Image(req.image());
+        userService.updateProfile(user, req.name(), req.surname(), imageBytes);
+    }
+
+    private byte[] decodeBase64Image(String base64Image) {
+        if (base64Image == null || base64Image.isBlank()) {
+            return null;
+        }
+        String base64Data = base64Image;
+        if (base64Data.contains(",")) {
+            base64Data = base64Data.substring(base64Data.indexOf(",") + 1);
+        }
+        return java.util.Base64.getDecoder().decode(base64Data);
     }
 
     @PostMapping("/invite")
