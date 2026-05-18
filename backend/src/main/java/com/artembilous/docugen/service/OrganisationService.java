@@ -58,13 +58,21 @@ public class OrganisationService {
     public List<MemberDTO> getOrganisationMembers(Long orgId) {
         List<Membership> memberships = membershipRepo.findByOrganisationOrganisationId(orgId);
         return memberships.stream()
-                .map(m -> new MemberDTO(
-                        m.getMembershipId(),
-                        m.getUser().getName(),
-                        m.getUser().getSurname(),
-                        m.getUser().getEmail(),
-                        m.getRoles().stream().map(Role::getName).toList()
-                ))
+                .map(m -> {
+                    String base64Image = null;
+                    byte[] img = m.getUser().getImage();
+                    if (img != null && img.length > 0) {
+                        base64Image = "data:image/png;base64," + java.util.Base64.getEncoder().encodeToString(img);
+                    }
+                    return new MemberDTO(
+                            m.getMembershipId(),
+                            m.getUser().getName(),
+                            m.getUser().getSurname(),
+                            m.getUser().getEmail(),
+                            m.getRoles().stream().map(Role::getName).toList(),
+                            base64Image
+                    );
+                })
                 .toList();
     }
 

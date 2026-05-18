@@ -4,4 +4,5 @@ export interface Member {
     surname: string | null;
     email: string;
     roles: string[];
+    image?: string | null;
 }

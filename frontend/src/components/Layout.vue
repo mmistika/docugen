@@ -91,7 +91,22 @@ const isActive = (path: string) => {
                             authStore.user?.email
                         }}</span>
                     </div>
-                    <div class="w-8 h-8 bg-gray-300 rounded-full shrink-0" />
+                    <img
+                        v-if="authStore.user?.image"
+                        :src="authStore.user.image"
+                        alt="Avatar"
+                        class="w-8 h-8 rounded-full object-cover shrink-0 border border-gray-200"
+                    />
+                    <div
+                        v-else
+                        class="w-8 h-8 bg-gray-900 text-white rounded-full flex items-center justify-center font-bold text-xs shrink-0 select-none shadow-xs border border-gray-200"
+                    >
+                        {{
+                            (
+                                authStore.user?.name?.charAt(0) || 'U'
+                            ).toUpperCase()
+                        }}
+                    </div>
                 </RouterLink>
             </div>
         </header>
@@ -297,8 +312,15 @@ const isActive = (path: string) => {
                         class="flex items-center gap-3 text-sm text-gray-600 rounded-lg hover:bg-gray-100 p-2 transition-all duration-200"
                         to="/profile"
                     >
+                        <img
+                            v-if="authStore.user?.image"
+                            :src="authStore.user.image"
+                            alt="Avatar"
+                            class="w-8 h-8 rounded-full object-cover shrink-0 border border-gray-200"
+                        />
                         <div
-                            class="w-8 h-8 bg-gray-900 text-white rounded-full flex items-center justify-center font-semibold shrink-0 shadow-xs"
+                            v-else
+                            class="w-8 h-8 bg-gray-900 text-white rounded-full flex items-center justify-center font-semibold shrink-0 shadow-xs border border-gray-200"
                         >
                             {{
                                 authStore.user?.name?.charAt(0).toUpperCase() ||

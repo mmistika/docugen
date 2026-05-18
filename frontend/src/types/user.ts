@@ -4,4 +4,5 @@ export interface MeResponse {
     name: string | null;
     surname: string | null;
     registered: boolean;
+    image: string | null;
 }

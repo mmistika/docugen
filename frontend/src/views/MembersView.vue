@@ -149,8 +149,15 @@ const handleSaveRoles = async (memberId: number, roles: string[]) => {
             <!-- Desktop -->
             <template #cell:member="{ item }">
                 <div class="flex items-center gap-3">
+                    <img
+                        v-if="item.image"
+                        :src="item.image"
+                        alt="Avatar"
+                        class="w-10 h-10 rounded-full object-cover border border-gray-300 shrink-0 shadow-sm"
+                    />
                     <div
-                        class="w-10 h-10 bg-gray-200 border border-gray-300 rounded-full shrink-0 flex items-center justify-center text-gray-500 font-bold text-xs"
+                        v-else
+                        class="w-10 h-10 bg-gray-200 border border-gray-300 rounded-full shrink-0 flex items-center justify-center text-gray-500 font-bold text-xs select-none shadow-sm"
                     >
                         {{ item.name?.[0] ?? '?'
                         }}{{ item?.surname?.[0] ?? '' }}
@@ -192,8 +199,15 @@ const handleSaveRoles = async (memberId: number, roles: string[]) => {
             <!-- Mobile -->
             <template #mobile-item="{ item }">
                 <div class="flex items-start gap-3 mb-3">
+                    <img
+                        v-if="item.image"
+                        :src="item.image"
+                        alt="Avatar"
+                        class="w-12 h-12 rounded-full object-cover border border-gray-300 shrink-0 shadow-sm"
+                    />
                     <div
-                        class="w-12 h-12 bg-gray-200 border border-gray-300 rounded-full shrink-0 flex items-center justify-center text-gray-500 font-bold"
+                        v-else
+                        class="w-12 h-12 bg-gray-200 border border-gray-300 rounded-full shrink-0 flex items-center justify-center text-gray-500 font-bold select-none shadow-sm"
                     >
                         {{ item.name?.[0] ?? '?' }}{{ item.surname?.[0] ?? '' }}
                     </div>

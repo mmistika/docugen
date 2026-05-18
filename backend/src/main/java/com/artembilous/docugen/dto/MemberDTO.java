@@ -7,5 +7,6 @@ public record MemberDTO(
         String name,
         String surname,
         String email,
-        List<String> roles
+        List<String> roles,
+        String image
 ) {}

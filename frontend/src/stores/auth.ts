@@ -22,6 +22,17 @@ export const useAuthStore = defineStore('auth', {
                 this.user.surname = surname;
             }
         },
+        async updateProfile(
+            name: string,
+            surname: string,
+            image: string | null
+        ) {
+            this.user = await api.users.updateProfile({
+                name,
+                surname,
+                image
+            });
+        },
         async completeOrg(orgName: string) {
             await api.organisations.create({ name: orgName });
             if (this.user) {

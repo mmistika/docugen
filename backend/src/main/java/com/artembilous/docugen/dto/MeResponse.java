@@ -5,5 +5,6 @@ public record MeResponse (
     String email,
     String name,
     String surname,
-    boolean registered
+    boolean registered,
+    String image
 ) {}

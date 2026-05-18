@@ -74,6 +74,14 @@ const users = {
         const res = await apiInstance.get<MeResponse>('/users/me');
         return res.data;
     },
+    async updateProfile(data: {
+        name: string;
+        surname: string;
+        image: string | null;
+    }): Promise<MeResponse> {
+        const res = await apiInstance.put<MeResponse>('/users/profile', data);
+        return res.data;
+    },
     async completeRegistration(data: {
         name: string;
         surname: string;
