@@ -2,9 +2,11 @@
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth.ts';
+import ImagePicker from '@/components/common/ImagePicker.vue';
 
 const name = ref<string>('');
 const surname = ref<string>('');
+const imageUrl = ref<string | null>(null);
 
 const authStore = useAuthStore();
 const router = useRouter();
@@ -20,9 +22,19 @@ const isFormValid = computed(() => {
     );
 });
 
+const getInitials = () => {
+    const f = name.value ? name.value.charAt(0) : '';
+    const l = surname.value ? surname.value.charAt(0) : '';
+    return (f + l).toUpperCase() || '?';
+};
+
 const submit = async (): Promise<void> => {
     if (isFormValid.value) {
-        await authStore.completeProfile(name.value, surname.value);
+        await authStore.completeProfile(
+            name.value,
+            surname.value,
+            imageUrl.value
+        );
         await router.push('/');
     }
 };
@@ -57,6 +69,19 @@ const submit = async (): Promise<void> => {
                     Tell us a bit more about yourself to get started.
                 </p>
                 <form class="space-y-4" @submit.prevent="submit">
+                    <div class="flex flex-col items-center mb-6">
+                        <label
+                            class="block text-sm font-medium text-gray-700 mb-3 w-full text-left"
+                        >
+                            Profile Picture (Optional)
+                        </label>
+                        <ImagePicker
+                            v-model="imageUrl"
+                            :initials="getInitials()"
+                            class="w-full"
+                        />
+                    </div>
+
                     <div>
                         <label
                             class="block text-sm font-medium text-gray-700 mb-1"

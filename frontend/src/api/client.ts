@@ -85,6 +85,7 @@ const users = {
     async completeRegistration(data: {
         name: string;
         surname: string;
+        image?: string | null;
     }): Promise<void> {
         await apiInstance.post('/users/complete-registration', data);
     },

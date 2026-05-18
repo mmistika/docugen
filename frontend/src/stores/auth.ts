@@ -15,11 +15,16 @@ export const useAuthStore = defineStore('auth', {
         async fetchMe() {
             this.user = await api.users.me();
         },
-        async completeProfile(name: string, surname: string) {
-            await api.users.completeRegistration({ name, surname });
+        async completeProfile(
+            name: string,
+            surname: string,
+            image: string | null = null
+        ) {
+            await api.users.completeRegistration({ name, surname, image });
             if (this.user) {
                 this.user.name = name;
                 this.user.surname = surname;
+                this.user.image = image;
             }
         },
         async updateProfile(
