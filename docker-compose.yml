@@ -4,8 +4,12 @@ services:
     image: postgres:18-alpine
     container_name: postgres_db
     env_file: .env
+    ports:
+      - "5432:5432"
     volumes:
       - ./db-init:/docker-entrypoint-initdb.d
+    tmpfs:
+      - /var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
@@ -35,6 +39,7 @@ services:
       args:
         - VITE_AUTH0_DOMAIN=${VITE_AUTH0_DOMAIN}
         - VITE_AUTH0_CLIENT_ID=${VITE_AUTH0_CLIENT_ID}
+        - VITE_API_URL=${VITE_API_URL}
     container_name: vue_frontend
     env_file: ./frontend/.env.local
     ports:
