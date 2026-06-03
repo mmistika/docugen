@@ -5,8 +5,25 @@ RUN ./gradlew bootJar --no-daemon
 
 FROM eclipse-temurin:25-jre-alpine
 WORKDIR /app
+RUN apk add --no-cache \
+    curl \
+    chromium-headless-shell \
+    nss \
+    freetype \
+    harfbuzz \
+    fontconfig \
+    font-inter \
+    font-liberation \
+    font-dejavu \
+    ttf-freefont \
+    font-noto-emoji \
+    nodejs
+
 COPY --from=build /app/build/libs/*.jar app.jar
 
-RUN apk add --no-cache curl
+ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+ENV PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium-headless-shell
+ENV PLAYWRIGHT_NODEJS_PATH=/usr/bin/node
+
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]

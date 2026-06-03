@@ -19,9 +19,13 @@ public class PdfService {
     public void init() {
         log.info("Initializing Playwright and launching headless Chromium browser...");
         this.playwright = Playwright.create();
-        this.browser = this.playwright.chromium().launch(
-                new BrowserType.LaunchOptions().setHeadless(true)
-        );
+        BrowserType.LaunchOptions options = new BrowserType.LaunchOptions().setHeadless(true);
+        String executablePath = System.getenv("PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH");
+        if (executablePath != null && !executablePath.isBlank()) {
+            log.info("Using system-provided Chromium at: {}", executablePath);
+            options.setExecutablePath(java.nio.file.Paths.get(executablePath));
+        }
+        this.browser = this.playwright.chromium().launch(options);
         log.info("Playwright and Chromium browser successfully initialized.");
     }
 
