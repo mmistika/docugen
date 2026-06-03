@@ -10,7 +10,10 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 
 @RestController
 @RequestMapping("/api/org/{orgId}/audit")
@@ -25,27 +28,28 @@ public class AuditController {
             @PathVariable Long orgId,
 
             @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-            LocalDateTime from,
+            Instant from,
 
             @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-            LocalDateTime to,
+            Instant to,
 
             Pageable pageable
     ) {
-        LocalDateTime now = LocalDateTime.now();
         if (to == null) {
-            to = now;
+            to = Instant.now();
         }
         if (from == null) {
-            from = to.minusDays(30);
+            from = to.minus(30, ChronoUnit.DAYS);
         }
+
+        LocalDateTime fromLocal = LocalDateTime.ofInstant(from, ZoneOffset.UTC);
+        LocalDateTime toLocal = LocalDateTime.ofInstant(to, ZoneOffset.UTC);
+
         return service.getLogs(
                 user,
                 orgId,
-                from,
-                to,
+                fromLocal,
+                toLocal,
                 pageable
         );
     }

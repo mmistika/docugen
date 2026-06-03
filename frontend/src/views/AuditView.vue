@@ -56,8 +56,8 @@ const fetch = async () => {
         const res = await api.organisations.audit.get(orgStore.currentOrgId, {
             page: page.value,
             size: PAGE_SIZE,
-            ...(fromInput.value ? { from: fromInput.value } : {}),
-            ...(toInput.value ? { to: toInput.value } : {})
+            ...(fromInput.value ? { from: new Date(fromInput.value).toISOString() } : {}),
+            ...(toInput.value ? { to: new Date(toInput.value).toISOString() } : {})
         });
         logs.value = res.content;
         totalPages.value = res.page.totalPages;
@@ -98,14 +98,21 @@ const pageButtons = computed(() => {
     return Array.from({ length: 7 }, (_, i) => start + i);
 });
 
-const formatTs = (ts: string) =>
-    new Date(ts).toLocaleString('en-GB', {
+const formatTs = (ts: string) => {
+    const date = new Date(ts);
+    const datePart = date.toLocaleDateString('en-GB', {
         day: '2-digit',
         month: 'short',
         year: 'numeric'
-    }) +
-    '\n' +
-    ts.split('T')[1];
+    });
+    const timePart = date.toLocaleTimeString('en-GB', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+    });
+    return `${datePart}\n${timePart}`;
+};
 
 const formatMetadata = (raw: string): string => {
     try {

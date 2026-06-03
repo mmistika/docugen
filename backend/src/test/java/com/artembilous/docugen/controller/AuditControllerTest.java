@@ -37,8 +37,8 @@ class AuditControllerTest extends BaseControllerTest {
 
         mockMvc.perform(get("/api/org/10/audit")
                         .with(authentication(testAuth))
-                        .param("from", "2026-06-01T00:00:00")
-                        .param("to", "2026-06-03T00:00:00")
+                        .param("from", "2026-06-01T00:00:00Z")
+                        .param("to", "2026-06-03T00:00:00Z")
                         .param("page", "0")
                         .param("size", "10"))
                 .andExpect(status().isOk())

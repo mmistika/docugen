@@ -106,8 +106,8 @@ describe('AuditView.vue', () => {
         expect(api.organisations.audit.get).toHaveBeenLastCalledWith(
             1,
             expect.objectContaining({
-                from: '2026-06-01T00:00',
-                to: '2026-06-02T23:59'
+                from: new Date('2026-06-01T00:00').toISOString(),
+                to: new Date('2026-06-02T23:59').toISOString()
             })
         );
     });
