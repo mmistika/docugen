@@ -20,12 +20,7 @@ export const useAuthStore = defineStore('auth', {
             surname: string,
             image: string | null = null
         ) {
-            await api.users.completeRegistration({ name, surname, image });
-            if (this.user) {
-                this.user.name = name;
-                this.user.surname = surname;
-                this.user.image = image;
-            }
+            this.user = await api.users.completeRegistration({ name, surname, image });
         },
         async updateProfile(
             name: string,

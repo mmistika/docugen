@@ -86,8 +86,9 @@ const users = {
         name: string;
         surname: string;
         image?: string | null;
-    }): Promise<void> {
-        await apiInstance.post('/users/complete-registration', data);
+    }): Promise<MeResponse> {
+        const res = await apiInstance.post<MeResponse>('/users/complete-registration', data);
+        return res.data;
     },
     async invite(data: {
         orgId: number;

@@ -85,13 +85,18 @@ class UserControllerTest extends BaseControllerTest {
     @Test
     void completeRegistration_ShouldCompleteRegistration() throws Exception {
         UpdateProfileRequest req = new UpdateProfileRequest("Jane", "Smith", "data:image/png;base64,AQID");
+        when(userService.isFullyRegistered(any(User.class))).thenReturn(true);
 
         mockMvc.perform(post("/api/users/complete-registration")
                         .with(authentication(testAuth))
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Jane"))
+                .andExpect(jsonPath("$.surname").value("Smith"))
+                .andExpect(jsonPath("$.registered").value(true))
+                .andExpect(jsonPath("$.image").value("data:image/png;base64,AQID"));
 
         verify(userService).updateProfile(any(User.class), eq("Jane"), eq("Smith"), eq(new byte[]{1, 2, 3}));
     }

@@ -66,8 +66,16 @@ describe('Auth Store', () => {
             image: null,
             registered: false
         };
+        const mockMe = {
+            userId: 1,
+            email: 'john.doe@example.com',
+            name: 'John',
+            surname: 'Doe',
+            image: null,
+            registered: true
+        };
 
-        vi.mocked(api.users.completeRegistration).mockResolvedValue();
+        vi.mocked(api.users.completeRegistration).mockResolvedValue(mockMe);
 
         await store.completeProfile('John', 'Doe');
 
@@ -76,23 +84,30 @@ describe('Auth Store', () => {
             surname: 'Doe',
             image: null
         });
-        expect(store.user.name).toBe('John');
-        expect(store.user.surname).toBe('Doe');
+        expect(store.user).toEqual(mockMe);
     });
 
-    it('should not throw error on completeProfile if user is not logged in', async () => {
+    it('should update state on completeProfile even if user was not initially loaded', async () => {
         const store = useAuthStore();
         store.user = null;
+        const mockMe = {
+            userId: 1,
+            email: 'john.doe@example.com',
+            name: 'John',
+            surname: 'Doe',
+            image: null,
+            registered: true
+        };
 
-        vi.mocked(api.users.completeRegistration).mockResolvedValue();
+        vi.mocked(api.users.completeRegistration).mockResolvedValue(mockMe);
 
-        expect(store.completeProfile('John', 'Doe')).resolves.not.toThrow();
+        await store.completeProfile('John', 'Doe');
         expect(api.users.completeRegistration).toHaveBeenCalledWith({
             name: 'John',
             surname: 'Doe',
             image: null
         });
-        expect(store.user).toBeNull();
+        expect(store.user).toEqual(mockMe);
     });
 
     it('should update profile and update user state', async () => {

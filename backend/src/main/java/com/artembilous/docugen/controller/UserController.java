@@ -56,9 +56,22 @@ public class UserController {
     }
 
     @PostMapping("/complete-registration")
-    public void complete(@AuthenticationPrincipal User user, @Valid @RequestBody UpdateProfileRequest req) {
+    public MeResponse complete(@AuthenticationPrincipal User user, @Valid @RequestBody UpdateProfileRequest req) {
         byte[] imageBytes = decodeBase64Image(req.image());
         userService.updateProfile(user, req.name(), req.surname(), imageBytes);
+
+        String newBase64Image = null;
+        if (imageBytes != null && imageBytes.length > 0) {
+            newBase64Image = "data:image/png;base64," + java.util.Base64.getEncoder().encodeToString(imageBytes);
+        }
+        return new MeResponse(
+                user.getUserId(),
+                user.getEmail(),
+                req.name(),
+                req.surname(),
+                userService.isFullyRegistered(user),
+                newBase64Image
+        );
     }
 
     private byte[] decodeBase64Image(String base64Image) {
