@@ -174,27 +174,18 @@ const highlightedHtml = computed(
                     <DocumentCanvas v-show="activeTab === 'document'">
                         <EditorContent :editor="editor" />
                     </DocumentCanvas>
-                    <div v-if="activeTab === 'manifest'" class="p-4 lg:p-8">
-                        <div
-                            class="max-w-4xl mx-auto bg-white border border-gray-300 rounded-lg shadow-sm overflow-hidden"
-                        >
-                            <pre class="p-6 text-sm overflow-auto"><code
-                  class="language-json hljs"
-                  v-html="highlightedManifest"
-              /></pre>
-                        </div>
-                    </div>
-
-                    <div v-if="activeTab === 'html'" class="p-4 lg:p-8">
-                        <div
-                            class="max-w-4xl mx-auto bg-white border border-gray-300 rounded-lg shadow-sm overflow-hidden"
-                        >
-                            <pre class="p-6 text-sm overflow-auto"><code
-                  class="language-xml hljs font-mono whitespace-pre-wrap"
-                  v-html="highlightedHtml"
-              /></pre>
-                        </div>
-                    </div>
+                    <DocumentCanvas v-show="activeTab === 'manifest'">
+                        <pre class="p-6 text-sm font-mono text-wrap"><code
+                            class="language-json hljs"
+                            v-html="highlightedManifest"
+                        /></pre>
+                    </DocumentCanvas>
+                    <DocumentCanvas v-show="activeTab === 'html'">
+                        <pre class="p-6 text-sm font-mono text-wrap"><code
+                            class="language-xml hljs font-mono"
+                            v-html="highlightedHtml"
+                        /></pre>
+                    </DocumentCanvas>
                 </div>
             </div>
             <FieldPropertiesPanel
