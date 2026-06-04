@@ -5,6 +5,7 @@ import { api } from '@/api/client';
 import type { AuditLogDTO } from '@/types/audit';
 import TabHeader from '@/components/common/TabHeader.vue';
 import DataTable from '@/components/common/DataTable.vue';
+import Pagination from '@/components/common/Pagination.vue';
 
 const orgStore = useOrgStore();
 
@@ -56,8 +57,12 @@ const fetch = async () => {
         const res = await api.organisations.audit.get(orgStore.currentOrgId, {
             page: page.value,
             size: PAGE_SIZE,
-            ...(fromInput.value ? { from: new Date(fromInput.value).toISOString() } : {}),
-            ...(toInput.value ? { to: new Date(toInput.value).toISOString() } : {})
+            ...(fromInput.value
+                ? { from: new Date(fromInput.value).toISOString() }
+                : {}),
+            ...(toInput.value
+                ? { to: new Date(toInput.value).toISOString() }
+                : {})
         });
         logs.value = res.content;
         totalPages.value = res.page.totalPages;
@@ -89,14 +94,6 @@ const clearFilters = () => {
     page.value = 0;
     fetch();
 };
-
-const pageButtons = computed(() => {
-    const total = totalPages.value;
-    const current = page.value;
-    if (total <= 7) return Array.from({ length: total }, (_, i) => i);
-    const start = Math.max(0, Math.min(current - 3, total - 7));
-    return Array.from({ length: 7 }, (_, i) => start + i);
-});
 
 const formatTs = (ts: string) => {
     const date = new Date(ts);
@@ -307,43 +304,12 @@ const BADGE = 'bg-gray-100 text-gray-700 border border-gray-200';
                 </div>
             </template>
         </DataTable>
-        <div
-            class="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-gray-50"
-        >
-            <p class="text-xs text-gray-500">
-                {{ totalElements }} total entr{{
-                    totalElements !== 1 ? 'ies' : 'y'
-                }}
-            </p>
-            <div class="flex items-center gap-1">
-                <button
-                    :disabled="page === 0"
-                    class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                    @click="page = Math.max(0, page - 1)"
-                >
-                    Previous
-                </button>
-                <button
-                    v-for="p in pageButtons"
-                    :key="p"
-                    :class="
-                        page === p
-                            ? 'bg-gray-900 text-white border-gray-900'
-                            : 'border-gray-300 hover:bg-white'
-                    "
-                    class="px-3 py-1 border rounded text-sm transition-colors"
-                    @click="page = p"
-                >
-                    {{ p + 1 }}
-                </button>
-                <button
-                    :disabled="page >= totalPages - 1"
-                    class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                    @click="page = Math.min(totalPages - 1, page + 1)"
-                >
-                    Next
-                </button>
-            </div>
-        </div>
+        <Pagination
+            v-model="page"
+            :total-elements="totalElements"
+            :total-pages="totalPages"
+            item-name="entry"
+            plural-item-name="entries"
+        />
     </div>
 </template>
