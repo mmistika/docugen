@@ -7,6 +7,7 @@ import hljsJson from 'highlight.js/lib/languages/json';
 import hljsXml from 'highlight.js/lib/languages/xml';
 import 'highlight.js/styles/github.css';
 import { useTemplateEditor } from '@/composables/useTemplateEditor';
+import beautify from 'js-beautify';
 import FieldSidebar from '@/components/editor/FieldSidebar.vue';
 import FieldPropertiesPanel from '@/components/editor/FieldPropertiesPanel.vue';
 import DocumentCanvas from '@/components/common/DocumentCanvas.vue';
@@ -53,14 +54,27 @@ const TABS: { key: Tab; label: string }[] = [
 
 const documentAreaRef = ref<HTMLElement | null>(null);
 
-const highlightedManifest = computed(
-    () => hljs.highlight(manifestJson.value, { language: 'json' }).value
-);
+const highlightedManifest = computed(() => {
+    if (activeTab.value !== 'manifest') return '';
+    return hljs.highlight(manifestJson.value, { language: 'json' }).value;
+});
 
-const highlightedHtml = computed(
-    () =>
-        hljs.highlight(editor.value?.getHTML() ?? '', { language: 'xml' }).value
-);
+const highlightedHtml = computed(() => {
+    if (activeTab.value !== 'html') return '';
+    const rawHtml = editor.value?.getHTML() ?? '';
+    const formattedHtml = beautify.html(rawHtml, {
+        indent_size: 4,
+        indent_char: ' ',
+        max_preserve_newlines: 1,
+        preserve_newlines: true,
+        wrap_line_length: 0,
+        indent_inner_html: true,
+        unformatted: [],
+        content_unformatted: [],
+        inline: []
+    });
+    return hljs.highlight(formattedHtml, { language: 'xml' }).value;
+});
 </script>
 
 <template>
