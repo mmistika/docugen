@@ -87,7 +87,10 @@ const users = {
         surname: string;
         image?: string | null;
     }): Promise<MeResponse> {
-        const res = await apiInstance.post<MeResponse>('/users/complete-registration', data);
+        const res = await apiInstance.post<MeResponse>(
+            '/users/complete-registration',
+            data
+        );
         return res.data;
     },
     async invite(data: {
@@ -207,8 +210,24 @@ const organisations = {
         }
     },
     documents: {
-        async all(orgId: number): Promise<Document[]> {
-            const res = await apiInstance.get(`/org/${orgId}/documents`);
+        async all(
+            orgId: number,
+            params?: {
+                page: number;
+                size: number;
+            }
+        ): Promise<{
+            content: Document[];
+            page: {
+                totalElements: number;
+                totalPages: number;
+                number: number;
+                size: number;
+            };
+        }> {
+            const res = await apiInstance.get(`/org/${orgId}/documents`, {
+                params
+            });
             return res.data;
         },
         async generate(

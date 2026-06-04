@@ -2,6 +2,8 @@ package com.artembilous.docugen.repository;
 
 import com.artembilous.docugen.dto.DocumentDTO;
 import com.artembilous.docugen.entity.Document;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -24,7 +26,7 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
         WHERE d.organisation.organisationId = :orgId
         ORDER BY d.createdAt DESC
     """)
-    List<DocumentDTO> findAllByOrg(Long orgId);
+    Page<DocumentDTO> findAllByOrg(Long orgId, Pageable pageable);
 
     Optional<Document> findByDocumentIdAndOrganisationOrganisationId(Long id, Long orgId);
 

@@ -8,6 +8,7 @@ import type { Document } from '@/types/document';
 import TabHeader from '@/components/common/TabHeader.vue';
 import SearchFilterBar from '@/components/common/SearchFilterBar.vue';
 import DataTable from '@/components/common/DataTable.vue';
+import Pagination from '@/components/common/Pagination.vue';
 
 const orgStore = useOrgStore();
 
@@ -27,21 +28,41 @@ const tableHeaders = [
 const isLoading = ref(true);
 const actionLoading = ref<Record<number, boolean>>({});
 
+const PAGE_SIZE = 10;
+const page = ref(0);
+const totalPages = ref(0);
+const totalElements = ref(0);
+
+const fetch = async () => {
+    if (!orgStore.currentOrgId) return;
+    isLoading.value = true;
+    try {
+        const res = await api.organisations.documents.all(
+            orgStore.currentOrgId,
+            {
+                page: page.value,
+                size: PAGE_SIZE
+            }
+        );
+        documents.value = res.content;
+        totalPages.value = res.page.totalPages;
+        totalElements.value = res.page.totalElements;
+    } catch {
+    } finally {
+        isLoading.value = false;
+    }
+};
+
 watch(
     () => orgStore.currentOrgId,
-    async () => {
-        if (!orgStore.currentOrgId) return;
-        isLoading.value = true;
-        try {
-            documents.value = await api.organisations.documents.all(
-                orgStore.currentOrgId
-            );
-        } finally {
-            isLoading.value = false;
-        }
+    () => {
+        page.value = 0;
+        fetch();
     },
     { immediate: true }
 );
+
+watch(page, fetch);
 
 const templateName = (doc: Document): string => {
     return doc.templateName;
@@ -288,5 +309,12 @@ const formatDate = (date: Date | string): string => {
                 </div>
             </template>
         </DataTable>
+        <Pagination
+            v-model="page"
+            :total-elements="totalElements"
+            :total-pages="totalPages"
+            item-name="document"
+            plural-item-name="documents"
+        />
     </div>
 </template>

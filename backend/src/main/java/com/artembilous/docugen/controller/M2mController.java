@@ -7,6 +7,7 @@ import com.artembilous.docugen.dto.TemplateDetailDTO;
 import com.artembilous.docugen.service.DocumentService;
 import com.artembilous.docugen.service.TemplateService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -44,7 +45,7 @@ public class M2mController {
 
     @GetMapping("/documents")
     public List<DocumentDTO> listDocuments(@PathVariable Long orgId) {
-        return documentService.list(null, orgId);
+        return documentService.list(null, orgId, Pageable.unpaged()).getContent();
     }
 
     @GetMapping("/documents/{id}")

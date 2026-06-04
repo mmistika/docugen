@@ -8,6 +8,8 @@ import com.artembilous.docugen.service.DocumentService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.time.LocalDateTime;
@@ -32,15 +34,16 @@ class DocumentControllerTest extends BaseControllerTest {
     @Test
     void list_ShouldReturnDocuments() throws Exception {
         DocumentDTO dto = new DocumentDTO(1L, "Test Doc", DocumentStatus.DRAFT, "Template A", LocalDateTime.now());
-        when(documentService.list(any(User.class), eq(10L))).thenReturn(List.of(dto));
+        PageImpl<DocumentDTO> page = new PageImpl<>(List.of(dto));
+        when(documentService.list(any(User.class), eq(10L), any(Pageable.class))).thenReturn(page);
 
         mockMvc.perform(get("/api/org/10/documents")
                         .with(authentication(testAuth)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(1L))
-                .andExpect(jsonPath("$[0].name").value("Test Doc"))
-                .andExpect(jsonPath("$[0].status").value("DRAFT"))
-                .andExpect(jsonPath("$[0].templateName").value("Template A"));
+                .andExpect(jsonPath("$.content[0].id").value(1L))
+                .andExpect(jsonPath("$.content[0].name").value("Test Doc"))
+                .andExpect(jsonPath("$.content[0].status").value("DRAFT"))
+                .andExpect(jsonPath("$.content[0].templateName").value("Template A"));
     }
 
     @Test

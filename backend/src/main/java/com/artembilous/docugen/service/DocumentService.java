@@ -9,6 +9,8 @@ import com.artembilous.docugen.repository.TemplateVersionRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.JsonNode;
@@ -77,8 +79,8 @@ public class DocumentService {
     }
 
     @PreAuthorize("hasPermission(#orgId, 'document:view')")
-    public List<DocumentDTO> list(User user, Long orgId) {
-        return documentRepository.findAllByOrg(orgId);
+    public Page<DocumentDTO> list(User user, Long orgId, Pageable pageable) {
+        return documentRepository.findAllByOrg(orgId, pageable);
     }
 
     @Transactional

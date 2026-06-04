@@ -55,8 +55,20 @@ describe('DocumentsView.vue', () => {
         }
     ];
 
+    const mockPagedResponse = {
+        content: mockDocs,
+        page: {
+            totalElements: mockDocs.length,
+            totalPages: 1,
+            number: 0,
+            size: 10
+        }
+    };
+
     it('loads documents and lists them in table', async () => {
-        vi.mocked(api.organisations.documents.all).mockResolvedValue(mockDocs);
+        vi.mocked(api.organisations.documents.all).mockResolvedValue(
+            mockPagedResponse as any
+        );
 
         const orgStore = useOrgStore();
         orgStore.currentOrgId = 5;
@@ -74,13 +86,18 @@ describe('DocumentsView.vue', () => {
         await vi.runAllTimersAsync();
         await wrapper.vm.$nextTick();
 
-        expect(api.organisations.documents.all).toHaveBeenCalledWith(5);
+        expect(api.organisations.documents.all).toHaveBeenCalledWith(5, {
+            page: 0,
+            size: 10
+        });
         expect(wrapper.text()).toContain('Doc A');
         expect(wrapper.text()).toContain('Doc B');
     });
 
     it('finalises draft document when click finalise button', async () => {
-        vi.mocked(api.organisations.documents.all).mockResolvedValue(mockDocs);
+        vi.mocked(api.organisations.documents.all).mockResolvedValue(
+            mockPagedResponse as any
+        );
         vi.mocked(api.organisations.documents.finalise).mockResolvedValue();
 
         const orgStore = useOrgStore();

@@ -5,6 +5,8 @@ import com.artembilous.docugen.dto.GenerateDocumentRequest;
 import com.artembilous.docugen.entity.User;
 import com.artembilous.docugen.service.DocumentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -19,8 +21,8 @@ public class DocumentController {
     private final DocumentService service;
 
     @GetMapping
-    public List<DocumentDTO> list(@AuthenticationPrincipal User user, @PathVariable Long orgId) {
-        return service.list(user, orgId);
+    public Page<DocumentDTO> list(@AuthenticationPrincipal User user, @PathVariable Long orgId, Pageable pageable) {
+        return service.list(user, orgId, pageable);
     }
 
     @PostMapping("/generate")
