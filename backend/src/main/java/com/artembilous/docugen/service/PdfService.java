@@ -16,38 +16,82 @@ public class PdfService {
     private Browser browser;
 
     @PostConstruct
-    public void init() {
-        log.info("Initializing Playwright and launching headless Chromium browser...");
-        this.playwright = Playwright.create();
-        BrowserType.LaunchOptions options = new BrowserType.LaunchOptions().setHeadless(true);
-        String executablePath = System.getenv("PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH");
-        if (executablePath != null && !executablePath.isBlank()) {
-            log.info("Using system-provided Chromium at: {}", executablePath);
-            options.setExecutablePath(java.nio.file.Paths.get(executablePath));
+    public synchronized void init() {
+        if (this.browser == null) {
+            log.info("Initializing Playwright and launching headless Chromium browser...");
+            this.playwright = Playwright.create();
+            BrowserType.LaunchOptions options = new BrowserType.LaunchOptions().setHeadless(true);
+            String executablePath = System.getenv("PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH");
+            if (executablePath != null && !executablePath.isBlank()) {
+                log.info("Using system-provided Chromium at: {}", executablePath);
+                options.setExecutablePath(java.nio.file.Paths.get(executablePath));
+            }
+            this.browser = this.playwright.chromium().launch(options);
+            log.info("Playwright and Chromium browser successfully initialized.");
         }
-        this.browser = this.playwright.chromium().launch(options);
-        log.info("Playwright and Chromium browser successfully initialized.");
     }
 
     @PreDestroy
-    public void cleanup() {
+    public synchronized void cleanup() {
         log.info("Shutting down Playwright browser process...");
         if (this.browser != null) {
             try {
                 this.browser.close();
             } catch (Exception ignored) {
             }
+            this.browser = null;
         }
         if (this.playwright != null) {
             try {
                 this.playwright.close();
             } catch (Exception ignored) {
             }
+            this.playwright = null;
         }
         log.info("Playwright browser process cleanly terminated.");
     }
 
+    private synchronized void reinitBrowser(Browser failedBrowser) {
+        if (this.browser == failedBrowser) {
+            log.warn("Active Playwright browser crashed or is disconnected. Re-initializing...");
+            cleanup();
+            init();
+        } else {
+            log.info("Playwright browser already re-initialized by another thread.");
+        }
+    }
+
+    private synchronized Browser getConnectedBrowser() {
+        if (this.browser == null || !this.browser.isConnected()) {
+            log.info("Browser is null or disconnected. Triggering re-initialization...");
+            cleanup();
+            init();
+        }
+        return this.browser;
+    }
+
+    Browser getBrowser() {
+        return this.browser;
+    }
+
     public byte[] generateFromHtml(String html) {
+        try {
+            return generateFromHtmlInternal(html);
+        } catch (Exception e) {
+            log.warn("PDF generation failed due to browser issue, attempting to recover and retry...", e);
+
+            reinitBrowser(this.browser);
+
+            try {
+                return generateFromHtmlInternal(html);
+            } catch (Exception ex) {
+                log.error("PDF generation failed again after browser recovery retry", ex);
+                throw new RuntimeException("PDF generation failed", ex);
+            }
+        }
+    }
+
+    private byte[] generateFromHtmlInternal(String html) {
         long startTime = System.currentTimeMillis();
         log.info("Initiating PDF generation request (HTML length: {})...", html.length());
 
@@ -145,7 +189,9 @@ public class PdfService {
                 "</body>\n" +
                 "</html>";
 
-        try (BrowserContext context = browser.newContext();
+        Browser currentBrowser = getConnectedBrowser();
+
+        try (BrowserContext context = currentBrowser.newContext();
              Page page = context.newPage()) {
 
             page.setContent(styledHtml, new Page.SetContentOptions().setWaitUntil(WaitUntilState.NETWORKIDLE));
@@ -164,9 +210,6 @@ public class PdfService {
             long duration = System.currentTimeMillis() - startTime;
             log.info("PDF generation completed successfully in {}ms (PDF size: {} bytes).", duration, pdf.length);
             return pdf;
-        } catch (Exception e) {
-            log.error("Failed to generate PDF from HTML: ", e);
-            throw new RuntimeException("PDF generation failed", e);
         }
     }
 }
