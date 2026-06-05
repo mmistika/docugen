@@ -6,7 +6,7 @@ import type { Editor } from '@tiptap/core';
 import { api } from '@/api/client';
 import { useOrgStore } from '@/stores/org';
 import type { Field, FieldType } from '@/types/field';
-import { createField } from '@/types/field';
+import { createField, FIELD_TYPE_MAP } from '@/types/field';
 import type { TemplateVersionStatus } from '@/types/template';
 import { InlineFieldNode } from '@/editor/extensions/InlineFieldNode';
 import TextAlign from '@tiptap/extension-text-align';
@@ -96,7 +96,7 @@ export function useTemplateEditor() {
             const existingConfig = inlineFields.value.find(
                 (f) => f.id === nodeAttrs.id
             );
-            if (existingConfig) {
+            if (existingConfig && existingConfig.type === nodeAttrs.type) {
                 return { ...existingConfig, ...nodeAttrs } as Field;
             }
 
@@ -249,7 +249,25 @@ export function useTemplateEditor() {
             (f) => f.id === selectedFieldId.value
         );
         if (globalMatch) {
-            (globalMatch as Record<string, unknown>)[key] = value;
+            if (key === 'type') {
+                const newType = value as FieldType;
+                const def = FIELD_TYPE_MAP[newType];
+                const updatedField = {
+                    id: globalMatch.id,
+                    name: globalMatch.name,
+                    type: newType,
+                    required: globalMatch.required,
+                    ...def.defaults
+                } as Field;
+                const idx = globalFields.value.findIndex(
+                    (f) => f.id === selectedFieldId.value
+                );
+                if (idx !== -1) {
+                    globalFields.value[idx] = updatedField;
+                }
+            } else {
+                (globalMatch as Record<string, unknown>)[key] = value;
+            }
             return;
         }
 
@@ -257,7 +275,26 @@ export function useTemplateEditor() {
             (f) => f.id === selectedFieldId.value
         );
         if (inlineMatch) {
-            (inlineMatch as Record<string, unknown>)[key] = value;
+            if (key === 'type') {
+                const newType = value as FieldType;
+                const def = FIELD_TYPE_MAP[newType];
+                const updatedField = {
+                    id: inlineMatch.id,
+                    name: inlineMatch.name,
+                    type: newType,
+                    required: inlineMatch.required,
+                    ...def.defaults
+                } as Field;
+                const idx = inlineFields.value.findIndex(
+                    (f) => f.id === selectedFieldId.value
+                );
+                if (idx !== -1) {
+                    inlineFields.value[idx] = updatedField;
+                }
+            } else {
+                (inlineMatch as Record<string, unknown>)[key] = value;
+            }
+
             if (['name', 'type', 'required'].includes(key) && editor.value) {
                 const { state, view } = editor.value;
                 let tr = state.tr;

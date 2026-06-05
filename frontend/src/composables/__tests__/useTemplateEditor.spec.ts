@@ -304,6 +304,38 @@ describe('useTemplateEditor Composable', () => {
         expect(mockEditor.view.dispatch).toHaveBeenCalled();
     });
 
+    it('should clean up old properties and initialize new defaults when changing field type', () => {
+        routeParams.value = { id: 'new' };
+        const editorComposable = useTemplateEditor();
+
+        editorComposable.addGlobalField('text');
+        expect(editorComposable.activeField.value?.type).toBe('text');
+        expect(editorComposable.activeField.value).toHaveProperty('maxLength');
+        expect(editorComposable.activeField.value).toHaveProperty('minLength');
+        expect(editorComposable.activeField.value).toHaveProperty(
+            'placeholder'
+        );
+        expect(editorComposable.activeField.value).not.toHaveProperty(
+            'decimalPlaces'
+        );
+
+        editorComposable.updateActiveField('type', 'number');
+        expect(editorComposable.activeField.value?.type).toBe('number');
+        expect(editorComposable.activeField.value).not.toHaveProperty(
+            'maxLength'
+        );
+        expect(editorComposable.activeField.value).not.toHaveProperty(
+            'minLength'
+        );
+        expect(editorComposable.activeField.value).not.toHaveProperty(
+            'placeholder'
+        );
+        expect(editorComposable.activeField.value).toHaveProperty(
+            'decimalPlaces'
+        );
+        expect(editorComposable.activeField.value?.decimalPlaces).toBe(0);
+    });
+
     it('should destroy editor when destroyEditor is called', () => {
         routeParams.value = { id: 'new' };
         const editorComposable = useTemplateEditor();
