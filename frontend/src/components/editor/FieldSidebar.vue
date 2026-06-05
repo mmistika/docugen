@@ -4,20 +4,21 @@ import type { Field, FieldType } from '@/types/field.ts';
 import { FIELD_TYPE_REGISTRY } from '@/types/field.ts';
 import FieldTypeButton from './FieldTypeButton.vue';
 
+import { ref } from 'vue';
+
+const fieldsExpanded = ref(true);
+const inlineFieldsExpanded = ref(true);
+
 defineProps<{
     globalFields: Field[];
     inlineFields: Field[];
     selectedFieldId: string | null;
-    fieldsExpanded: boolean;
-    inlineFieldsExpanded: boolean;
 }>();
 
 const emit = defineEmits<{
     (e: 'add-global', type: FieldType): void;
     (e: 'insert-inline', type: FieldType): void;
     (e: 'select-field', id: string): void;
-    (e: 'update:fieldsExpanded', v: boolean): void;
-    (e: 'update:inlineFieldsExpanded', v: boolean): void;
 }>();
 </script>
 
@@ -63,7 +64,7 @@ const emit = defineEmits<{
             <div>
                 <button
                     class="flex items-center gap-2 text-sm font-medium text-gray-900 w-full hover:bg-gray-100 px-2 py-1 rounded"
-                    @click="emit('update:fieldsExpanded', !fieldsExpanded)"
+                    @click="fieldsExpanded = !fieldsExpanded"
                 >
                     <ChevronDown v-if="fieldsExpanded" :size="16" />
                     <ChevronRight v-else :size="16" />
@@ -97,12 +98,7 @@ const emit = defineEmits<{
             <div>
                 <button
                     class="flex items-center gap-2 text-sm font-medium text-gray-900 w-full hover:bg-gray-100 px-2 py-1 rounded"
-                    @click="
-                        emit(
-                            'update:inlineFieldsExpanded',
-                            !inlineFieldsExpanded
-                        )
-                    "
+                    @click="inlineFieldsExpanded = !inlineFieldsExpanded"
                 >
                     <ChevronDown v-if="inlineFieldsExpanded" :size="16" />
                     <ChevronRight v-else :size="16" />

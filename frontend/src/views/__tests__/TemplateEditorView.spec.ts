@@ -19,8 +19,6 @@ vi.mock('@/composables/useTemplateEditor', () => ({
         isLoading: ref(false),
         templateName: ref('Wayne Employment Contract'),
         selectedFieldId: ref(null),
-        fieldsExpanded: ref(true),
-        inlineFieldsExpanded: ref(true),
         hasChanges: ref(true),
         status: ref('DRAFT'),
         globalFields: ref([]),

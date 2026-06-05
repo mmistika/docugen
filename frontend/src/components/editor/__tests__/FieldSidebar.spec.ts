@@ -16,9 +16,7 @@ describe('FieldSidebar.vue', () => {
             props: {
                 globalFields,
                 inlineFields,
-                selectedFieldId: null,
-                fieldsExpanded: true,
-                inlineFieldsExpanded: true
+                selectedFieldId: null
             }
         });
 
@@ -33,9 +31,7 @@ describe('FieldSidebar.vue', () => {
             props: {
                 globalFields: [],
                 inlineFields: [],
-                selectedFieldId: null,
-                fieldsExpanded: false,
-                inlineFieldsExpanded: false
+                selectedFieldId: null
             }
         });
 
@@ -50,9 +46,7 @@ describe('FieldSidebar.vue', () => {
             props: {
                 globalFields,
                 inlineFields,
-                selectedFieldId: null,
-                fieldsExpanded: true,
-                inlineFieldsExpanded: true
+                selectedFieldId: null
             }
         });
 
@@ -64,16 +58,17 @@ describe('FieldSidebar.vue', () => {
         expect(wrapper.emitted('select-field')?.[0]).toEqual(['g1']);
     });
 
-    it('emits update:fieldsExpanded and update:inlineFieldsExpanded when toggles clicked', async () => {
+    it('toggles visibility of global and inline fields when header buttons are clicked', async () => {
         const wrapper = mount(FieldSidebar, {
             props: {
                 globalFields,
                 inlineFields,
-                selectedFieldId: null,
-                fieldsExpanded: true,
-                inlineFieldsExpanded: true
+                selectedFieldId: null
             }
         });
+
+        expect(wrapper.text()).toContain('Global1');
+        expect(wrapper.text()).toContain('Inline1');
 
         const toggleButtons = wrapper
             .findAll('button')
@@ -84,11 +79,11 @@ describe('FieldSidebar.vue', () => {
             );
 
         await toggleButtons[0].trigger('click');
-        expect(wrapper.emitted('update:fieldsExpanded')?.[0]).toEqual([false]);
+        expect(wrapper.text()).not.toContain('Global1');
+        expect(wrapper.text()).toContain('Inline1');
 
         await toggleButtons[1].trigger('click');
-        expect(wrapper.emitted('update:inlineFieldsExpanded')?.[0]).toEqual([
-            false
-        ]);
+        expect(wrapper.text()).not.toContain('Global1');
+        expect(wrapper.text()).not.toContain('Inline1');
     });
 });

@@ -44,8 +44,6 @@ export function useTemplateEditor() {
 
     const templateName = ref(isNew.value ? 'New Template' : '');
     const selectedFieldId = ref<string | null>(null);
-    const fieldsExpanded = ref(true);
-    const inlineFieldsExpanded = ref(true);
     const isLoading = ref(true);
     const hasChanges = ref(false);
     const status = ref<TemplateVersionStatus>('DRAFT');
@@ -286,8 +284,6 @@ export function useTemplateEditor() {
         isLoading,
         templateName,
         selectedFieldId,
-        fieldsExpanded,
-        inlineFieldsExpanded,
         hasChanges,
         status,
         globalFields,

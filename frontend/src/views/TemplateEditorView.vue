@@ -21,8 +21,6 @@ const {
     isLoading,
     templateName,
     selectedFieldId,
-    fieldsExpanded,
-    inlineFieldsExpanded,
     hasChanges,
     status,
     globalFields,
@@ -149,16 +147,12 @@ const highlightedHtml = computed(() => {
         </div>
         <div class="flex flex-1 overflow-hidden">
             <FieldSidebar
-                :fields-expanded="fieldsExpanded"
                 :global-fields="globalFields"
                 :inline-fields="inlineFields"
-                :inline-fields-expanded="inlineFieldsExpanded"
                 :selected-field-id="selectedFieldId"
                 @add-global="addGlobalField"
                 @insert-inline="insertInlineField"
                 @select-field="selectedFieldId = $event"
-                @update:fields-expanded="fieldsExpanded = $event"
-                @update:inline-fields-expanded="inlineFieldsExpanded = $event"
             />
             <div class="flex-1 flex flex-col overflow-hidden bg-gray-100">
                 <div
