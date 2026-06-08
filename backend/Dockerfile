@@ -1,7 +1,12 @@
 FROM eclipse-temurin:25-jdk-alpine AS build
 WORKDIR /app
+
+COPY gradlew settings.gradle build.gradle ./
+COPY gradle ./gradle
+RUN --mount=type=cache,target=/root/.gradle ./gradlew dependencies --no-daemon
+
 COPY . .
-RUN ./gradlew bootJar --no-daemon
+RUN --mount=type=cache,target=/root/.gradle ./gradlew bootJar --no-daemon
 
 FROM eclipse-temurin:25-jre-alpine
 WORKDIR /app

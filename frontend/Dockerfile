@@ -1,5 +1,9 @@
 FROM node:22-alpine AS build
 WORKDIR /app
+
+COPY package*.json ./
+RUN --mount=type=cache,target=/root/.npm npm install
+
 ARG VITE_AUTH0_DOMAIN
 ARG VITE_AUTH0_CLIENT_ID
 ARG VITE_API_URL
@@ -7,8 +11,6 @@ ENV VITE_AUTH0_DOMAIN=$VITE_AUTH0_DOMAIN
 ENV VITE_AUTH0_CLIENT_ID=$VITE_AUTH0_CLIENT_ID
 ENV VITE_API_URL=$VITE_API_URL
 
-COPY package*.json ./
-RUN npm install
 COPY . .
 RUN npm run build
 
